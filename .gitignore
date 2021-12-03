@@ -10,6 +10,7 @@
 
 # Build files
 build
+!src/build
 
 # Generated files
 minerva.gpr

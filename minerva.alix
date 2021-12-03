@@ -17,4 +17,4 @@ depend = { project = gcs version = any }
 depend = { project = wlib version = any }
 depend = { project = pdp11 version = any }
 path_unit = { unit = Minerva.Paths
-              path = src/minerva-paths.ads }
+              path = src/driver/minerva-paths.ads }
