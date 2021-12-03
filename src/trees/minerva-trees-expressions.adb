@@ -257,6 +257,8 @@ package body Minerva.Trees.Expressions is
       Possible_Type : Minerva.Types.Class_Reference)
    is
    begin
+      This.Possible_Types.Clear;
+      This.Possible_Types.Append (Possible_Type);
       This.Expression_Type := Possible_Type;
    end Set_Type;
 
