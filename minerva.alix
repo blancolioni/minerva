@@ -1,0 +1,20 @@
+project_name = Minerva
+source_dir = src
+source_dir = src/build
+source_dir = src/driver
+source_dir = src/entries
+source_dir = src/names
+source_dir = src/parser
+source_dir = src/primitives
+source_dir = src/trees
+source_dir = src/types
+source_dir = src/values
+main_unit = minerva-driver
+exec_name = minerva
+config_dir = config
+depend = { project = tagatha version = any }
+depend = { project = gcs version = any }
+depend = { project = wlib version = any }
+depend = { project = pdp11 version = any }
+path_unit = { unit = Minerva.Paths
+              path = src/minerva-paths.ads }
