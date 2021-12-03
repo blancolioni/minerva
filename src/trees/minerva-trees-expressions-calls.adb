@@ -60,6 +60,13 @@ package body Minerva.Trees.Expressions.Calls is
          then
             for I in 1 .. Call_Type.Argument_Count loop
                Arg_Types (I).Append (Call_Type.Argument (I).Entry_Type);
+               declare
+                  Actual : Minerva.Trees.Expressions.Class_Reference renames
+                             This.Actuals (I);
+               begin
+                  Actual.Add_Possible_Type
+                    (Call_Type.Argument (I).Entry_Type);
+               end;
             end loop;
             Call_Types.Append (Types.Class_Reference (Call_Type));
          end if;
