@@ -97,7 +97,4 @@ private
       return String
    is (Cased_Text (Name.Name));
 
-   function Join (Left, Right : Minerva_Name) return Minerva_Name
-   is (Join ((Left, Right)));
-
 end Minerva.Names;

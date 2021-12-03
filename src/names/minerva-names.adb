@@ -146,6 +146,16 @@ package body Minerva.Names is
       end;
    end Join;
 
+   ----------
+   -- Join --
+   ----------
+
+   function Join (Left, Right : Minerva_Name) return Minerva_Name is
+      Arr : constant Minerva_Name_Array := (Left, Right);
+   begin
+      return Join (Arr);
+   end Join;
+
    ----------------
    -- Qualifiers --
    ----------------
