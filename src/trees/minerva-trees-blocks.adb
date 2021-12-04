@@ -33,9 +33,6 @@ package body Minerva.Trees.Blocks is
       Environment : Minerva.Environment.Environment_Id)
    is
    begin
-      This.Environment :=
-        Minerva.Environment.Create_Environment
-          (This.Name, Environment);
       for Declaration of This.Declarations loop
          Declaration.Check (This.Environment);
       end loop;
@@ -75,10 +72,12 @@ package body Minerva.Trees.Blocks is
    overriding procedure Compile_Tree
      (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
    is
+      Frame_Words : constant Natural :=
+                      Minerva.Environment.Current_Frame_Offset
+                        (This.Environment)
+                        - This.Frame_Offset;
    begin
-      Unit.Begin_Frame
-        (Frame_Words =>
-           Minerva.Environment.Current_Frame_Offset (This.Environment));
+      Unit.Begin_Frame (Frame_Words);
       for Declaration of This.Declarations loop
          Declaration.Compile (Unit);
       end loop;
@@ -101,6 +100,7 @@ package body Minerva.Trees.Blocks is
       return Result : constant Class_Reference := new Instance'
         (Parent with
            Name => Minerva.Names.To_Name (Name),
+         Frame_Offset => 0,
          Environment => <>,
          Declarations => <>,
          Statements   => <>)
@@ -108,6 +108,28 @@ package body Minerva.Trees.Blocks is
          Result.Initialize (Position);
       end return;
    end Create_Block;
+
+   --------------------
+   -- Elaborate_Tree --
+   --------------------
+
+   overriding procedure Elaborate_Tree
+     (This        : not null access Instance;
+      Environment : Minerva.Environment.Environment_Id)
+   is
+   begin
+      This.Environment :=
+        Minerva.Environment.Create_Environment
+          (This.Name, Environment);
+      Minerva.Environment.Set_Frame_Offset
+        (This.Environment, This.Frame_Offset);
+      for Declaration of This.Declarations loop
+         Declaration.Elaborate (This.Environment);
+      end loop;
+      for Statement of This.Statements loop
+         Statement.Elaborate (This.Environment);
+      end loop;
+   end Elaborate_Tree;
 
    -----------
    -- Image --
@@ -121,5 +143,17 @@ package body Minerva.Trees.Blocks is
          return "block";
       end if;
    end Image;
+
+   ---------------------
+   -- Set_Frame_Start --
+   ---------------------
+
+   procedure Set_Frame_Start
+     (This   : in out Class;
+      Offset : Natural)
+   is
+   begin
+      This.Frame_Offset := Offset;
+   end Set_Frame_Start;
 
 end Minerva.Trees.Blocks;

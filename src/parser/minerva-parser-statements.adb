@@ -3,12 +3,14 @@ with GCS.Positions;
 with Minerva.Parser.Tokens;             use Minerva.Parser.Tokens;
 with Minerva.Parser.Lexical;            use Minerva.Parser.Lexical;
 
---  with Minerva.Parser.Blocks;
+with Minerva.Parser.Blocks;
 with Minerva.Parser.Expressions;
 
+with Minerva.Trees.Blocks;
 with Minerva.Trees.Expressions;
 with Minerva.Trees.Statements.Assignment_Statement;
 with Minerva.Trees.Statements.Call;
+with Minerva.Trees.Statements.Declare_Statement;
 with Minerva.Trees.Statements.If_Statement;
 with Minerva.Trees.Statements.Loop_Statement;
 with Minerva.Trees.Statements.Null_Statement;
@@ -239,17 +241,15 @@ package body Minerva.Parser.Statements is
 
          end;
       elsif Tok = Tok_Declare then
-         null;
-         --  declare
-         --     Declare_Node : constant Minerva.Trees.Tree_Node_Id :=
-         --                      Minerva.Trees.Create_Node
-         --                        (Minerva.Trees.T_Declare_Statement,
-         --                         Start_Position);
-         --  begin
-         --     Minerva.Trees.Append (Parent, Declare_Node);
-         --     Scan;
-         --     Minerva.Parser.Blocks.Parse_Block (Declare_Node, "");
-         --  end;
+         Scan;
+         declare
+            Block : constant Minerva.Trees.Blocks.Class_Reference :=
+                      Minerva.Parser.Blocks.Parse_Block ("");
+         begin
+            Result := Minerva.Trees.Statements.Class_Reference
+              (Minerva.Trees.Statements.Declare_Statement
+               .Create (Start_Position, Block));
+         end;
 
       else
          raise Constraint_Error with

@@ -19,6 +19,10 @@ package Minerva.Trees.Blocks is
    type Reference is access all Instance;
    type Class_Reference is access all Class;
 
+   overriding procedure Elaborate_Tree
+     (This        : not null access Instance;
+      Environment : Minerva.Environment.Environment_Id);
+
    overriding procedure Check_Tree
      (This        : in out Instance;
       Environment : Minerva.Environment.Environment_Id);
@@ -30,6 +34,10 @@ package Minerva.Trees.Blocks is
    overriding function Children
      (This    : Instance)
       return Class_Reference_Array;
+
+   procedure Set_Frame_Start
+     (This   : in out Class;
+      Offset : Natural);
 
    procedure Add_Declaration
      (This        : in out Class;
@@ -62,6 +70,7 @@ private
      and Minerva.Names.Name_Interface with
       record
          Name         : Minerva.Names.Minerva_Name;
+         Frame_Offset : Natural;
          Declarations : Declaration_Lists.List;
          Statements   : Statement_Lists.List;
       end record;
