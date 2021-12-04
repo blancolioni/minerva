@@ -41,13 +41,11 @@ private
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit);
 
-   overriding procedure Set_Available_Types
-     (This        : in out Instance;
-      Environment : Minerva.Ids.Environment_Id);
-
-   overriding procedure Constrain_Type
+   overriding function Constrain_Types
      (This           : in out Instance;
-      Possible_Types : Minerva.Types.Lists.List);
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+      return Minerva.Types.Lists.List;
 
    overriding procedure Set_Type
      (This          : in out Instance;

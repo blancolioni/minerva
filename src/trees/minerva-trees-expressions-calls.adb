@@ -21,20 +21,22 @@ package body Minerva.Trees.Expressions.Calls is
       end return;
    end Children;
 
-   --------------------
-   -- Constrain_Type --
-   --------------------
+   ---------------------
+   -- Constrain_Types --
+   ---------------------
 
-   overriding procedure Constrain_Type
+   overriding function Constrain_Types
      (This           : in out Instance;
-      Possible_Types : Minerva.Types.Lists.List)
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+      return Minerva.Types.Lists.List
    is
       use Minerva.Types.Callable;
       subtype Call_Reference is
         Minerva.Types.Callable.Class_Reference;
 
       Call_Types : Minerva.Types.Lists.List;
-      Arg_Types : array (1 .. This.Actuals.Last_Index)
+      Arg_Types  : array (1 .. This.Actuals.Last_Index)
         of Minerva.Types.Lists.List;
 
       procedure Check_Call_Type
@@ -54,19 +56,19 @@ package body Minerva.Trees.Expressions.Calls is
          Return_Type : Minerva.Types.Class_Reference)
       is
       begin
+         This.Log
+           ("checking call type " & Call_Type.Short_Name
+            & ": convertible to " & Return_Type.Short_Name
+            & " = "
+            & Boolean'Image
+              (Call_Type.Return_Type.Is_Convertible_To (Return_Type)));
+
          if Call_Type.Has_Return_Type
            and then Call_Type.Return_Type.Is_Convertible_To (Return_Type)
            and then Call_Type.Argument_Count = This.Actuals.Last_Index
          then
             for I in 1 .. Call_Type.Argument_Count loop
                Arg_Types (I).Append (Call_Type.Argument (I).Entry_Type);
-               declare
-                  Actual : Minerva.Trees.Expressions.Class_Reference renames
-                             This.Actuals (I);
-               begin
-                  Actual.Add_Possible_Type
-                    (Call_Type.Argument (I).Entry_Type);
-               end;
             end loop;
             Call_Types.Append (Types.Class_Reference (Call_Type));
          end if;
@@ -83,7 +85,7 @@ package body Minerva.Trees.Expressions.Calls is
       begin
          for I in 1 .. Call_Type.Argument_Count loop
             if not Is_Compatible (Call_Type.Argument (I).Entry_Type,
-                                  This.Actuals.Element (I).Available_Types)
+                                  Arg_Types (I))
             then
                return False;
             end if;
@@ -91,25 +93,21 @@ package body Minerva.Trees.Expressions.Calls is
          return True;
       end Match;
 
+      Found_Types : constant Minerva.Types.Lists.List :=
+                      This.Call.Constrain_Types
+                        (Minerva.Types.Lists.Empty_List,
+                         Environment);
    begin
       Minerva.Logging.Log
         (This.Image,
          "constraining type");
-      for Available of This.Available_Types loop
-         Minerva.Logging.Log
-           (This.Image, "available type: " & Available.Short_Name);
-      end loop;
-
       for Possible_Type of Possible_Types loop
          Minerva.Logging.Log
            (This.Image,
             "possible type: " & Possible_Type.Short_Name);
-
-         if Is_Compatible (Possible_Type, This.Available_Types) then
-            for Call_Type of This.Call.Available_Types loop
-               Check_Call_Type (To_Callable (Call_Type), Possible_Type);
-            end loop;
-         end if;
+         for Call_Type of Found_Types loop
+            Check_Call_Type (To_Callable (Call_Type), Possible_Type);
+         end loop;
       end loop;
 
       for I in 1 .. This.Actuals.Last_Index loop
@@ -117,52 +115,24 @@ package body Minerva.Trees.Expressions.Calls is
             Actual : Minerva.Trees.Expressions.Class_Reference renames
                        This.Actuals (I);
          begin
-            for Arg_Type of Arg_Types (I) loop
-               Actual.Log ("constrained to "
-                           & Arg_Type.Short_Name);
-            end loop;
-            Actual.Constrain_Type (Arg_Types (I));
+            Arg_Types (I) :=
+              Actual.Constrain_Types (Arg_Types (I), Environment);
          end;
       end loop;
 
-      This.Available_Types.Clear;
-
       declare
-         Matching_Call_Types : Minerva.Types.Lists.List;
+         Matching_Types : Minerva.Types.Lists.List;
       begin
          for Call_Type of Call_Types loop
             if Match (To_Callable (Call_Type)) then
-               Matching_Call_Types.Append (Call_Type);
+               Matching_Types.Append
+                 (To_Callable (Call_Type).Return_Type);
+               This.Call_Types.Append (Call_Type);
             end if;
          end loop;
-
-         if Matching_Call_Types.Is_Empty then
-            This.Add_Error ("no-interpretation-matches");
-         elsif Natural (Matching_Call_Types.Length) > 1 then
-            This.Add_Error ("ambiguous-call," & This.Call.Image);
-         else
-            declare
-               Call_Type       : constant Call_Reference :=
-                                   To_Callable
-                                     (Matching_Call_Types.First_Element);
-               pragma Assert (Call_Type.Has_Return_Type,
-                              "expected a function type");
-            begin
-               This.Call.Set_Type (Types.Class_Reference (Call_Type));
-               This.Available_Types.Append (Call_Type.Return_Type);
-               for I in 1 .. This.Actuals.Last_Index loop
-                  declare
-                     Actual : Minerva.Trees.Expressions.Class_Reference renames
-                                This.Actuals (I);
-                  begin
-                     Actual.Set_Type
-                       (Call_Type.Argument (I).Entry_Type);
-                  end;
-               end loop;
-            end;
-         end if;
+         return Matching_Types;
       end;
-   end Constrain_Type;
+   end Constrain_Types;
 
    ----------------------------
    -- Create_Call_Expression --
@@ -251,25 +221,41 @@ package body Minerva.Trees.Expressions.Calls is
       This.Call.Push (Unit);
    end Push;
 
-   -------------------------
-   -- Set_Available_Types --
-   -------------------------
+   --------------
+   -- Set_Type --
+   --------------
 
-   overriding procedure Set_Available_Types
-     (This        : in out Instance;
-      Environment : Minerva.Ids.Environment_Id)
+   overriding procedure Set_Type
+     (This          : in out Instance;
+      Possible_Type : Minerva.Types.Class_Reference)
    is
+      Found : Boolean := False;
    begin
-      This.Call.Set_Available_Types (Environment);
-      for Actual of This.Actuals loop
-         Actual.Set_Available_Types (Environment);
+      for Call_Type of This.Call_Types loop
+         declare
+            use Minerva.Types.Callable;
+            Callable : constant Minerva.Types.Callable.Class_Reference :=
+                         To_Callable (Call_Type);
+         begin
+            if Callable.Return_Type.Is_Convertible_To (Possible_Type) then
+               if Found then
+                  This.Add_Error ("ambiguous");
+               else
+                  Found := True;
+                  This.Call.Set_Type (Call_Type);
+                  for I in 1 .. This.Actuals.Last_Index loop
+                     declare
+                        Actual : constant Expressions.Class_Reference :=
+                                   This.Actuals (I);
+                     begin
+                        Actual.Set_Type
+                          (Callable.Argument (I).Entry_Type);
+                     end;
+                  end loop;
+               end if;
+            end if;
+         end;
       end loop;
-      for Available_Type of This.Call.Available_Types loop
-         This.Available_Types.Append
-           (Minerva.Types.Callable.To_Callable (Available_Type)
-            .Return_Type);
-      end loop;
-      This.Constrain_Type (This.Possible_Types);
-   end Set_Available_Types;
+   end Set_Type;
 
 end Minerva.Trees.Expressions.Calls;

@@ -32,11 +32,12 @@ private
 
    type Instance is new Parent with
       record
-         Call      : Expressions.Class_Reference;
-         Actuals   : Actual_Argument_Vectors.Vector;
-         Intrinsic : Boolean := False;
-         Operator  : Minerva.Operators.Minerva_Operator :=
-                       Minerva.Operators.Op_None;
+         Call       : Expressions.Class_Reference;
+         Actuals    : Actual_Argument_Vectors.Vector;
+         Intrinsic  : Boolean := False;
+         Operator   : Minerva.Operators.Minerva_Operator :=
+                        Minerva.Operators.Op_None;
+         Call_Types : Minerva.Types.Lists.List;
       end record;
 
    overriding function Image
@@ -51,13 +52,23 @@ private
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit);
 
-   overriding procedure Set_Available_Types
-     (This        : in out Instance;
-      Environment : Minerva.Ids.Environment_Id);
+   --  overriding function Get_Possible_Types
+   --    (This : Instance)
+   --     return Minerva.Types.Lists.List;
 
-   overriding procedure Constrain_Type
+   --  overriding function Children
+   --    (This : Instance)
+   --     return Minerva.Inference.Typeable_Reference_Array;
+
+   overriding procedure Set_Type
+     (This          : in out Instance;
+      Possible_Type : Minerva.Types.Class_Reference);
+
+   overriding function Constrain_Types
      (This           : in out Instance;
-      Possible_Types : Minerva.Types.Lists.List);
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+      return Minerva.Types.Lists.List;
 
    overriding function Is_Static
      (This        : Instance;

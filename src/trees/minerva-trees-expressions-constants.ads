@@ -32,8 +32,9 @@ private
 
    type Instance is new Parent with
       record
-         Const_Type : Constant_Type;
-         Image      : Minerva.Names.Minerva_Name;
+         Const_Type     : Constant_Type;
+         Image          : Minerva.Names.Minerva_Name;
+         Universal_Type : Minerva.Types.Class_Reference;
       end record;
 
    overriding function Image
@@ -52,13 +53,11 @@ private
      (This : Instance)
       return Class_Reference_Array;
 
-   overriding procedure Set_Available_Types
-     (This        : in out Instance;
-      Environment : Minerva.Ids.Environment_Id);
-
-   overriding procedure Constrain_Type
+   overriding function Constrain_Types
      (This           : in out Instance;
-      Possible_Types : Minerva.Types.Lists.List);
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+      return Minerva.Types.Lists.List;
 
    overriding function Is_Static
      (This        : Instance;

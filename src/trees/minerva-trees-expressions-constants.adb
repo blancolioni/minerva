@@ -21,24 +21,25 @@ package body Minerva.Trees.Expressions.Constants is
       return Result;
    end Children;
 
-   --------------------
-   -- Constrain_Type --
-   --------------------
+   ---------------------
+   -- Constrain_Types --
+   ---------------------
 
-   overriding procedure Constrain_Type
+   overriding function Constrain_Types
      (This           : in out Instance;
-      Possible_Types : Minerva.Types.Lists.List)
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+      return Minerva.Types.Lists.List
    is
-      Universal : constant Minerva.Types.Class_Reference :=
-                    This.Available_Types.First_Element;
    begin
-      This.Available_Types.Clear;
-      for Possible of Possible_Types loop
-         if Universal.Is_Convertible_To (Possible) then
-            This.Available_Types.Append (Possible);
-         end if;
-      end loop;
-   end Constrain_Type;
+      return Result : Minerva.Types.Lists.List do
+         for Possible of Possible_Types loop
+            if This.Universal_Type.Is_Convertible_To (Possible) then
+               Result.Append (Possible);
+            end if;
+         end loop;
+      end return;
+   end Constrain_Types;
 
    ----------------------------
    -- Create_Universal_Float --
@@ -54,6 +55,8 @@ package body Minerva.Trees.Expressions.Constants is
          Result.Initialize (Position);
          Result.Const_Type := Universal_Float_Constant;
          Result.Image := Minerva.Names.To_Name (Image);
+         Result.Universal_Type :=
+           Minerva.Types.Universal.Universal_Float;
       end return;
    end Create_Universal_Float;
 
@@ -71,6 +74,8 @@ package body Minerva.Trees.Expressions.Constants is
          Result.Initialize (Position);
          Result.Const_Type := Universal_Integer_Constant;
          Result.Image := Minerva.Names.To_Name (Image);
+         Result.Universal_Type :=
+           Minerva.Types.Universal.Universal_Integer;
       end return;
    end Create_Universal_Integer;
 
@@ -199,26 +204,5 @@ package body Minerva.Trees.Expressions.Constants is
             null;
       end case;
    end Push;
-
-   -------------------------
-   -- Set_Available_Types --
-   -------------------------
-
-   overriding procedure Set_Available_Types
-     (This        : in out Instance;
-      Environment : Minerva.Ids.Environment_Id)
-   is
-   begin
-      case This.Const_Type is
-         when Universal_Integer_Constant =>
-            This.Available_Types.Append
-              (Minerva.Types.Universal.Universal_Integer);
-         when Universal_Float_Constant =>
-            This.Available_Types.Append
-              (Minerva.Types.Universal.Universal_Float);
-         when Universal_String_Constant =>
-            null;
-      end case;
-   end Set_Available_Types;
 
 end Minerva.Trees.Expressions.Constants;

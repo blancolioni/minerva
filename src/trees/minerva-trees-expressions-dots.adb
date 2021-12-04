@@ -1,8 +1,5 @@
 with Minerva.Entries.Withs;
 with Minerva.Names;
-with Minerva.Types.Callable;
-
-with Minerva.Logging;
 
 package body Minerva.Trees.Expressions.Dots is
 
@@ -16,61 +13,38 @@ package body Minerva.Trees.Expressions.Dots is
       return Maybe (This.Left);
    end Children;
 
-   --------------------
-   -- Constrain_Type --
-   --------------------
+   ---------------------
+   -- Constrain_Types --
+   ---------------------
 
-   overriding procedure Constrain_Type
+   overriding function Constrain_Types
      (This           : in out Instance;
-      Possible_Types : Minerva.Types.Lists.List)
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+      return Minerva.Types.Lists.List
    is
-      use Minerva.Types.Callable;
-      subtype Call_Reference is
-        Minerva.Types.Callable.Class_Reference;
-
-      Call_Types : Minerva.Types.Lists.List;
+      Left_Types : constant Minerva.Types.Lists.List :=
+                     This.Left.Constrain_Types
+                       (Minerva.Types.Lists.Empty_List, Environment);
+      pragma Unreferenced (Left_Types);
    begin
       if This.Left.Has_Entry
         and then This.Left.Get_Entry.Is_Package_Reference
       then
-         This.Log ("constraining type");
-         for Available of This.Available_Types loop
-            This.Log
-              ("available type: " & Available.Short_Name);
-         end loop;
-
-         for Possible_Type of Possible_Types loop
-            This.Log
-              ("possible type: " & Possible_Type.Short_Name);
-
-            if Is_Compatible (Possible_Type, This.Available_Types) then
-               Call_Types.Append (Possible_Type);
-            end if;
-         end loop;
-
-         This.Available_Types.Clear;
-
-         if Call_Types.Is_Empty then
-            This.Add_Error ("no-interpretation-matches");
-         elsif Natural (Call_Types.Length) > 1 then
-            This.Add_Error ("ambiguous-call," & This.Image);
-         elsif Is_Callable (Call_Types.First_Element) then
-            declare
-               Call_Type       : constant Call_Reference :=
-                                   To_Callable
-                                     (Call_Types.First_Element);
-               pragma Assert (Call_Type.Has_Return_Type,
-                              "expected a function type");
-            begin
-               This.Set_Type (Call_Type.Return_Type);
-               This.Available_Types.Append (Call_Type.Return_Type);
-            end;
-         else
-            This.Set_Type (Call_Types.First_Element);
-            This.Available_Types.Append (Call_Types.First_Element);
-         end if;
+         declare
+            Package_Env : constant Minerva.Ids.Environment_Id :=
+                            Minerva.Entries.Withs.Constant_Class_Reference
+                              (This.Left.Get_Entry)
+                              .Child_Environment;
+         begin
+            return This.Constrain_Identifier
+              (This.Right, Possible_Types, Package_Env);
+         end;
+      else
+         return (raise Constraint_Error with
+                   ". only implmented for packages");
       end if;
-   end Constrain_Type;
+   end Constrain_Types;
 
    ---------------------------
    -- Create_Dot_Expression --
@@ -155,28 +129,6 @@ package body Minerva.Trees.Expressions.Dots is
       end if;
    end Push;
 
-   -------------------------
-   -- Set_Available_Types --
-   -------------------------
-
-   overriding procedure Set_Available_Types
-     (This        : in out Instance;
-      Environment : Minerva.Ids.Environment_Id)
-   is
-   begin
-      This.Left.Set_Available_Types (Environment);
-      if This.Left.Has_Entry
-        and then This.Left.Get_Entry.Is_Package_Reference
-      then
-         This.Set_Identifier_Types
-             (Identifier  => This.Right,
-              Environment =>
-                Minerva.Entries.Withs.Constant_Class_Reference
-                  (This.Left.Get_Entry)
-              .Child_Environment);
-      end if;
-   end Set_Available_Types;
-
    --------------
    -- Set_Type --
    --------------
@@ -187,13 +139,11 @@ package body Minerva.Trees.Expressions.Dots is
    is
       Found : Boolean := False;
    begin
-      Minerva.Logging.Log (This.Image, "setting type to "
-                          & Possible_Type.Short_Name);
+      This.Log ("setting type to "
+                & Possible_Type.Short_Name);
 
       for Matching_Entry of This.Matching_Entries loop
 
-         Minerva.Logging.Log (This.Image, "check entry "
-                             & Matching_Entry.Cased_Text);
          if Matching_Entry.Entry_Type.Is_Convertible_To (Possible_Type) then
             pragma Assert (not Found, "multiple matches in set type");
             This.Set_Entry (Matching_Entry);

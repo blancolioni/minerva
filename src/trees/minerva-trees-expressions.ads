@@ -10,7 +10,9 @@ package Minerva.Trees.Expressions is
 
    subtype Parent is Trees.Instance;
 
-   type Instance is abstract new Parent with private;
+   type Instance is
+     abstract new Parent
+   with private;
 
    subtype Class is Instance'Class;
 
@@ -24,11 +26,6 @@ package Minerva.Trees.Expressions is
    overriding procedure Compile_Tree
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   procedure Set_Available_Types
-     (This        : in out Instance;
-      Environment : Minerva.Ids.Environment_Id)
-   is abstract;
 
    procedure Push
      (This : Instance;
@@ -50,13 +47,15 @@ package Minerva.Trees.Expressions is
      (This        : Instance;
       Environment : Minerva.Environment.Environment_Id)
       return Minerva.Values.Minerva_Value
-   is abstract
+      is abstract
      with Pre'Class => This.Is_Static (Environment);
 
-   procedure Set_Identifier_Types
-     (This        : in out Class;
-      Identifier  : Minerva.Names.Minerva_Name;
-      Environment : Minerva.Ids.Environment_Id);
+   function Constrain_Types
+     (This           : in out Instance;
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+      return Minerva.Types.Lists.List
+      is abstract;
 
    procedure Add_Possible_Type
      (This          : in out Class;
@@ -95,13 +94,6 @@ package Minerva.Trees.Expressions is
      (This : Class)
       return Minerva.Types.Lists.List;
 
-   function Available_Types
-     (This : Class)
-      return Minerva.Types.Lists.List;
-
-   procedure Resolve_Types
-     (This : in out Class);
-
 private
 
    subtype Dispatch is Instance'Class;
@@ -110,27 +102,29 @@ private
      new Ada.Containers.Doubly_Linked_Lists
        (Minerva.Entries.Constant_Class_Reference, Minerva.Entries."=");
 
-   type Instance is abstract new Parent with
+   type Instance is
+     abstract new Parent with
       record
          Expression_Type  : Minerva.Types.Class_Reference;
          Possible_Types   : Minerva.Types.Lists.List;
-         Available_Types  : Minerva.Types.Lists.List;
          Matching_Entries : Matching_Entry_Lists.List;
       end record;
 
+   function Constrain_Identifier
+     (This           : in out Instance;
+      Identifier     : Minerva.Names.Minerva_Name;
+      Possible_Types : Minerva.Types.Lists.List;
+      Environment    : Minerva.Environment.Environment_Id)
+         return Minerva.Types.Lists.List;
+
    function Possible_Types
      (This : Class)
-      return Minerva.Types.Lists.List
+         return Minerva.Types.Lists.List
    is (This.Possible_Types);
-
-   function Available_Types
-     (This : Class)
-      return Minerva.Types.Lists.List
-   is (This.Available_Types);
 
    function Has_Type
      (This : Class)
-      return Boolean
+         return Boolean
    is (Minerva.Types."/=" (This.Expression_Type, null));
 
 end Minerva.Trees.Expressions;
