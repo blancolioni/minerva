@@ -54,6 +54,10 @@ private
       return Minerva.Names.Minerva_Name
    is (This.Name);
 
+   overriding procedure Elaborate_Tree
+     (This        : not null access Instance;
+      Environment : Minerva.Environment.Environment_Id);
+
    overriding procedure Check_Tree
      (This        : in out Instance;
       Environment : Minerva.Environment.Environment_Id);

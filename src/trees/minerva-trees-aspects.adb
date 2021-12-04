@@ -8,11 +8,8 @@ package body Minerva.Trees.Aspects is
      (This        : in out Instance;
       Environment : Minerva.Environment.Environment_Id)
    is
-      use type Minerva.Trees.Expressions.Class_Reference;
    begin
-      if This.Value /= null then
-         This.Value.Check (Environment);
-      end if;
+      null;
    end Check_Tree;
 
    --------------
@@ -74,6 +71,22 @@ package body Minerva.Trees.Aspects is
          Result.Initialize (Position);
       end return;
    end Create_Aspect;
+
+   --------------------
+   -- Elaborate_Tree --
+   --------------------
+
+   overriding procedure Elaborate_Tree
+     (This        : not null access Instance;
+      Environment : Minerva.Environment.Environment_Id)
+   is
+      use type Minerva.Trees.Expressions.Class_Reference;
+   begin
+      if This.Value /= null then
+         This.Value.Elaborate (Environment);
+         This.Value.Check (Environment);
+      end if;
+   end Elaborate_Tree;
 
    ---------------
    -- Has_Value --
