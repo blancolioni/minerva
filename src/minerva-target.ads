@@ -11,4 +11,9 @@ package Minerva.Target is
       return Natural
    is (Natural ((Size + 15) / Target_Word_Size));
 
+   function To_Object_Size
+     (Word_Size : Natural)
+      return Object_Size
+   is (Object_Size (Word_Size) * Target_Word_Size);
+
 end Minerva.Target;

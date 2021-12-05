@@ -3,6 +3,8 @@ with GCS.Positions;
 with Minerva.Parser.Tokens;             use Minerva.Parser.Tokens;
 with Minerva.Parser.Lexical;            use Minerva.Parser.Lexical;
 
+with Minerva.Trees.Declarations.Types;
+
 with Minerva.Trees.Aspects;
 with Minerva.Trees.Expressions;
 with Minerva.Trees.Identifiers.Sequence;
@@ -20,6 +22,10 @@ package body Minerva.Parser.Declarations is
      (Context : Parser_Context)
      return Minerva.Trees.Declarations.Class_Reference;
 
+   function Parse_Type_Declaration
+     (Context : Parser_Context)
+      return Minerva.Trees.Declarations.Class_Reference;
+
    --------------------
    -- At_Declaration --
    --------------------
@@ -27,6 +33,7 @@ package body Minerva.Parser.Declarations is
    function At_Declaration return Boolean is
    begin
       return Tok = Tok_Identifier
+        or else Tok = Tok_Type
         or else Tok = Tok_Function
         or else Tok = Tok_Procedure;
    end At_Declaration;
@@ -43,6 +50,8 @@ package body Minerva.Parser.Declarations is
    begin
       if Tok = Tok_Identifier then
          Declaration := Parse_Object_Declaration (Context);
+      elsif Tok = Tok_Type then
+         Declaration := Parse_Type_Declaration (Context);
       elsif Tok = Tok_Function or else Tok = Tok_Procedure then
          Declaration :=
            Minerva.Parser.Subprograms.Parse_Subprogram;
@@ -175,8 +184,15 @@ package body Minerva.Parser.Declarations is
             Names       => Names,
             Object_Type => Type_Tree,
             Initializer => Initializer),
+            when Record_Component =>
+              Minerva.Trees.Declarations.Objects
+         .Create_Record_Component_Declaration
+           (Position    => Position,
+            Names       => Names,
+            Object_Type => Type_Tree,
+            Initializer => Initializer),
             when Formal_Argument                     =>
-               Minerva.Trees.Declarations.Objects
+              Minerva.Trees.Declarations.Objects
          .Create_Formal_Argument_Declaration
            (Position    => Position,
             Names       => Names,
@@ -185,5 +201,61 @@ package body Minerva.Parser.Declarations is
             Initializer => Initializer)));
 
    end Parse_Object_Declaration;
+
+   ----------------------------------------
+   -- Parse_Record_Component_Declaration --
+   ----------------------------------------
+
+   function Parse_Record_Component_Declaration
+     return Minerva.Trees.Declarations.Objects.Class_Reference
+   is
+   begin
+      return Minerva.Trees.Declarations.Objects.Class_Reference
+        (Parse_Object_Declaration (Context => Record_Component));
+   end Parse_Record_Component_Declaration;
+
+   ----------------------------
+   -- Parse_Type_Declaration --
+   ----------------------------
+
+   function Parse_Type_Declaration
+     (Context : Parser_Context)
+      return Minerva.Trees.Declarations.Class_Reference
+   is
+      pragma Unreferenced (Context);
+   begin
+      Scan;
+
+      if Tok = Tok_Identifier then
+         declare
+            Start : constant GCS.Positions.File_Position :=
+                      Get_Current_Position;
+            Name  : constant String := Tok_Text;
+            Defn  : Minerva.Trees.Types.Class_Reference;
+         begin
+            Scan;
+            if Tok = Tok_Is then
+               Scan;
+               Defn := Minerva.Parser.Types.Parse_Type;
+            else
+               Error ("missing 'is'");
+               Skip_To (Tok_Semicolon);
+               Defn :=
+                 Minerva.Trees.Types.Class_Reference
+                   (Minerva.Trees.Types.Named.Create_Named_Type
+                      (Get_Current_Position, "integer"));
+            end if;
+            return Minerva.Trees.Declarations.Class_Reference
+              (Minerva.Trees.Declarations.Types.Create
+                 (Position        => Start,
+                  Defining_Name   => Name,
+                  Type_Definition => Defn));
+         end;
+      else
+         Error ("missing type name");
+         Skip_To (Tok_Semicolon);
+         return null;
+      end if;
+   end Parse_Type_Declaration;
 
 end Minerva.Parser.Declarations;

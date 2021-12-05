@@ -7,6 +7,7 @@ with Minerva.Operators;
 --  with Minerva.Entries.Value.Components;
 with Minerva.Entries.Value.Formal_Arguments;
 with Minerva.Entries.Subprograms;
+with Minerva.Entries.Withs;
 with Minerva.Types;
 with Minerva.Types.Callable;
 
@@ -257,14 +258,39 @@ package body Minerva.Environment is
       return Boolean
    is
       use Minerva.Ids;
-      Env : Environment_Record renames
-              Environment_Table (Environment);
-      Position : constant Entry_Lists.Cursor :=
-                   Find (Env.Entries, Name);
+      Env : Minerva.Ids.Environment_Id := Environment;
+      Base_Name : constant Minerva.Names.Minerva_Name :=
+                    Minerva.Names.Base_Name (Name);
+      Recurse   : Boolean := Recursive;
    begin
-      return Entry_Lists.Has_Element (Position)
-        or else (Recursive and then Env.Parent /= Null_Environment_Id
-                 and then Exists (Env.Parent, Name, Recursive));
+      for Prefix of Minerva.Names.Qualifiers (Name) loop
+         if not Exists (Env, Prefix) then
+            return False;
+         end if;
+         declare
+            Prefix_Entry : constant Minerva.Entries.Constant_Class_Reference :=
+                             Get (Env, Prefix);
+         begin
+            if not Prefix_Entry.Is_Package_Reference then
+               return False;
+            end if;
+            Env :=
+              Minerva.Entries.Withs.Constant_Class_Reference (Prefix_Entry)
+              .Child_Environment;
+            Recurse := False;
+         end;
+      end loop;
+
+      declare
+         Rec      : Environment_Record renames
+                      Environment_Table (Environment);
+         Position : constant Entry_Lists.Cursor :=
+                      Find (Rec.Entries, Base_Name);
+      begin
+         return Entry_Lists.Has_Element (Position)
+           or else (Recurse and then Rec.Parent /= Null_Environment_Id
+                    and then Exists (Rec.Parent, Base_Name, Recurse));
+      end;
    end Exists;
 
    ------------
@@ -312,21 +338,40 @@ package body Minerva.Environment is
       return Minerva.Entries.Constant_Class_Reference
    is
       use Minerva.Ids;
-      Env      : Environment_Record renames
-                   Environment_Table (Environment);
-      Position : constant Entry_Lists.Cursor :=
-                   Find (Env.Entries, Name);
+      Env       : Minerva.Ids.Environment_Id := Environment;
+      Base_Name : constant Minerva.Names.Minerva_Name :=
+                    Minerva.Names.Base_Name (Name);
+      Recurse   : Boolean := Recursive;
    begin
-      pragma Assert (Entry_Lists.Has_Element (Position)
-                     or else (Recursive
-                       and then Env.Parent /= Null_Environment_Id
-                       and then Exists (Env.Parent, Name, Recursive)));
+      for Prefix of Minerva.Names.Qualifiers (Name) loop
+         pragma Assert (Exists (Env, Prefix),
+                        "environment.get: prefix does not exist");
+         declare
+            Prefix_Entry : constant Minerva.Entries.Constant_Class_Reference :=
+                             Get (Env, Prefix);
+         begin
+            pragma Assert (Prefix_Entry.Is_Package_Reference,
+                           "environment.get: prefix is not package reference");
+            Env :=
+              Minerva.Entries.Withs.Constant_Class_Reference (Prefix_Entry)
+              .Child_Environment;
+            Recurse := False;
+         end;
+      end loop;
 
-      if Entry_Lists.Has_Element (Position) then
-         return Entry_Lists.Element (Position);
-      else
-         return Get (Env.Parent, Name, Recursive);
-      end if;
+      declare
+         Rec      : Environment_Record renames
+                      Environment_Table (Environment);
+         Position : constant Entry_Lists.Cursor :=
+                      Find (Rec.Entries, Base_Name);
+      begin
+         if Entry_Lists.Has_Element (Position) then
+            return Entry_Lists.Element (Position);
+         else
+            pragma Assert (Recurse, "environment.get: precondition violated");
+            return Get (Rec.Parent, Name, Recurse);
+         end if;
+      end;
    end Get;
 
    ---------

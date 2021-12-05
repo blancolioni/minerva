@@ -7,16 +7,22 @@ package body Minerva.Entries.Value.Components is
    function Create
      (Declaration    : not null access Minerva.Trees.Class;
       Component_Name : Minerva.Names.Minerva_Name;
-      Component_Type : Minerva.Types.Class_Reference)
-      return Class_Reference
+      Component_Type : Minerva.Types.Class_Reference;
+      Word_Offset    : Natural;
+      Bit_Offset     : Natural := 0)
+      return Constant_Class_Reference
    is
+      This : Instance := Instance'
+        (Parent with
+         Word_Offset => Word_Offset,
+         Bit_Offset  => Bit_Offset);
    begin
-      return This : constant Class_Reference := new Instance do
-         This.Initialize_Value_Entry
-           (Declared_Name      => Component_Name,
-            Declaration        => Declaration,
-            Entry_Type         => Component_Type);
-      end return;
+      Initialize_Value_Entry
+        (This               => This,
+         Declared_Name      => Component_Name,
+         Declaration        => Declaration,
+         Entry_Type         => Component_Type);
+      return new Instance'(This);
    end Create;
 
    ---------
@@ -54,10 +60,8 @@ package body Minerva.Entries.Value.Components is
       Unit : in out Tagatha.Units.Tagatha_Unit)
    is
    begin
-      Parent (This).Push_Address (Unit);
       Unit.Push
-        (Tagatha.Tagatha_Integer
-           (Tagatha.Size_Octets (This.Component_Offset)));
+        (Tagatha.Tagatha_Integer (This.Word_Offset));
       Unit.Operate (Tagatha.Op_Add);
    end Push_Address;
 

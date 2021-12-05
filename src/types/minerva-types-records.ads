@@ -17,7 +17,8 @@ package Minerva.Types.Records is
    type Constant_Class_Reference is access all Class;
 
    function Create
-     (Component_Environment : Minerva.Environment.Environment_Id)
+     (Definition            : not null access Minerva.Trees.Class;
+      Component_Environment : Minerva.Environment.Environment_Id)
       return Class_Reference;
 
 private
@@ -29,9 +30,9 @@ private
          Components : Minerva.Environment.Environment_Id;
       end record;
 
-   overriding function Short_Name
+   overriding function Description
      (This : Instance)
       return String
    is ("a record type");
 
-end Minerva.Types.Composite.Records;
+end Minerva.Types.Records;

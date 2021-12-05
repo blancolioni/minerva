@@ -13,14 +13,16 @@ package Minerva.Entries.Value.Components is
    type Reference is access all Instance;
    type Class_Reference is access all Class;
 
-   type Constant_Reference is access all Instance;
-   type Constant_Class_Reference is access all Class;
+   type Constant_Reference is access constant Instance;
+   type Constant_Class_Reference is access constant Class;
 
    function Create
      (Declaration    : not null access Minerva.Trees.Class;
       Component_Name : Minerva.Names.Minerva_Name;
-      Component_Type : Minerva.Types.Class_Reference)
-      return Class_Reference;
+      Component_Type : Minerva.Types.Class_Reference;
+      Word_Offset    : Natural;
+      Bit_Offset     : Natural := 0)
+      return Constant_Class_Reference;
 
 private
 
@@ -28,7 +30,8 @@ private
 
    type Instance is new Parent with
       record
-         Component_Offset : Tagatha.Tagatha_Size;
+         Word_Offset      : Natural;
+         Bit_Offset       : Natural;
       end record;
 
    overriding procedure Pop

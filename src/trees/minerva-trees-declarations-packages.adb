@@ -80,7 +80,9 @@ package body Minerva.Trees.Declarations.Packages is
         (Parent with
          Is_Body       => True,
          Context       => Context,
-         Parent_Names  => Minerva.Names.Qualifiers (Full_Name),
+         Parent_Names  =>
+           Minerva.Names.Join
+             (Minerva.Names.Qualifiers (Full_Name)),
          Parent_Entry  => null,
          Defining_Name => Minerva.Names.Base_Name (Full_Name),
          Children      => List_Of_Declarations.Empty_List)
@@ -105,7 +107,9 @@ package body Minerva.Trees.Declarations.Packages is
       return This : constant Class_Reference := new Instance'
         (Parent with
            Is_Body => False,
-         Parent_Names  => Minerva.Names.Qualifiers (Full_Name),
+         Parent_Names  =>
+           Minerva.Names.Join
+             (Minerva.Names.Qualifiers (Full_Name)),
          Parent_Entry  => null,
          Defining_Name => Minerva.Names.Base_Name (Full_Name),
          Context       => Context,

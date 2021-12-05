@@ -29,12 +29,20 @@ package Minerva.Trees.Declarations.Objects is
       Initializer : Minerva.Trees.Expressions.Class_Reference)
       return Class_Reference;
 
+   function Create_Record_Component_Declaration
+     (Position    : GCS.Positions.File_Position;
+      Names       : Minerva.Trees.Identifiers.Sequence.Class_Reference;
+      Object_Type : Minerva.Trees.Types.Class_Reference;
+      Initializer : Minerva.Trees.Expressions.Class_Reference)
+      return Class_Reference;
+
 private
 
    type Declaration_Context is
      (Package_Context,
       Block_Context,
-      Formal_Argument_Context);
+      Formal_Argument_Context,
+      Record_Context);
 
    type Instance is new Parent with
       record

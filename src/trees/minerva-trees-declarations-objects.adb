@@ -1,13 +1,10 @@
---  with Tagatha.Constants;
---  with Tagatha.Transfers;
-
+with Minerva.Entries.Value.Components;
 with Minerva.Entries.Value.Formal_Arguments;
 with Minerva.Entries.Value.Objects;
 with Minerva.Names;
 with Minerva.Target;
 with Minerva.Types;
 with Minerva.Values;
---  with Minerva.Values;
 
 package body Minerva.Trees.Declarations.Objects is
 
@@ -150,6 +147,27 @@ package body Minerva.Trees.Declarations.Objects is
       end return;
    end Create_Object_Declaration;
 
+   function Create_Record_Component_Declaration
+     (Position    : GCS.Positions.File_Position;
+      Names       : Minerva.Trees.Identifiers.Sequence.Class_Reference;
+      Object_Type : Minerva.Trees.Types.Class_Reference;
+      Initializer : Minerva.Trees.Expressions.Class_Reference)
+      return Class_Reference
+   is
+      use type Minerva.Trees.Expressions.Class_Reference;
+   begin
+      return Result : constant Class_Reference := new Instance'
+        (Parent with Names => Names,
+         Context           => Record_Context,
+         Mode              => In_Mode,
+         Object_Type       => Object_Type,
+         Has_Initializer   => Initializer /= null,
+         Initializer       => Initializer)
+      do
+         Result.Initialize (Position);
+      end return;
+   end Create_Record_Component_Declaration;
+
    --------------------
    -- Elaborate_Tree --
    --------------------
@@ -243,6 +261,27 @@ package body Minerva.Trees.Declarations.Objects is
                                        Offset         =>
                                           Tagatha.Argument_Offset
                                          (New_Offset));
+            begin
+               Minerva.Environment.Insert (Environment, New_Entry);
+               Frame_Offset := New_Offset;
+               Name_Node.Set_Entry (New_Entry);
+            end;
+         elsif This.Context = Record_Context then
+            declare
+               use Minerva.Entries.Value.Components;
+               subtype Component_Reference is
+                 Minerva.Entries.Value.Components
+                   .Constant_Class_Reference;
+               Frame_Words      : constant Natural :=
+                                    This.Object_Type.Get_Type.Size_Words;
+               New_Offset       : constant Natural :=
+                                    Frame_Offset + Frame_Words;
+               New_Entry        : constant Component_Reference :=
+                                    Create
+                                      (Declaration    => This,
+                                       Component_Name => Name,
+                                       Component_Type => Object_Type,
+                                       Word_Offset    => Frame_Offset);
             begin
                Minerva.Environment.Insert (Environment, New_Entry);
                Frame_Offset := New_Offset;

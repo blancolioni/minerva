@@ -3,7 +3,7 @@ with Minerva.Trees;
 private package Minerva.Parser is
 
    type Parser_Context is
-     (Package_Spec, Package_Body, Block, Formal_Argument);
+     (Package_Spec, Package_Body, Block, Formal_Argument, Record_Component);
 
    function Parse_File
      (Path : String)

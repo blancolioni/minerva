@@ -44,13 +44,15 @@ private package Minerva.Environment is
         function (Test_Entry : Minerva.Entries.Constant_Class_Reference)
       return Boolean;
       Process     : not null access
-        procedure (Found_Entry : Minerva.Entries.Constant_Class_Reference));
+        procedure (Found_Entry : Minerva.Entries.Constant_Class_Reference))
+     with Pre => Minerva.Names.Qualifiers (Name)'Length = 0;
 
    procedure Iterate_Names
      (Environment : Minerva.Ids.Environment_Id;
       Name        : Minerva.Names.Minerva_Name;
       Process     : not null access
-        procedure (Found_Entry : Minerva.Entries.Constant_Class_Reference));
+        procedure (Found_Entry : Minerva.Entries.Constant_Class_Reference))
+     with Pre => Minerva.Names.Qualifiers (Name)'Length = 0;
 
    procedure Insert
      (Environment : Minerva.Ids.Environment_Id;

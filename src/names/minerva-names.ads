@@ -36,7 +36,7 @@ private package Minerva.Names is
    function Join (Names : Minerva_Name_Array) return Minerva_Name;
    function Split (Name : Minerva_Name) return Minerva_Name_Array;
 
-   function Qualifiers (Name : Minerva_Name) return Minerva_Name;
+   function Qualifiers (Name : Minerva_Name) return Minerva_Name_Array;
    function Base_Name (Name : Minerva_Name) return Minerva_Name;
 
    procedure Iterate

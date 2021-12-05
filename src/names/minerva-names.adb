@@ -160,10 +160,10 @@ package body Minerva.Names is
    -- Qualifiers --
    ----------------
 
-   function Qualifiers (Name : Minerva_Name) return Minerva_Name is
+   function Qualifiers (Name : Minerva_Name) return Minerva_Name_Array is
       Parts : constant Minerva_Name_Array := Split (Name);
    begin
-      return Join (Parts (Parts'First .. Parts'Last - 1));
+      return Parts (Parts'First .. Parts'Last - 1);
    end Qualifiers;
 
    ----------

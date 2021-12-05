@@ -11,4 +11,7 @@ package Minerva.Parser.Declarations is
    function Parse_Formal_Argument_Declaration
      return Minerva.Trees.Declarations.Objects.Class_Reference;
 
+   function Parse_Record_Component_Declaration
+     return Minerva.Trees.Declarations.Objects.Class_Reference;
+
 end Minerva.Parser.Declarations;
