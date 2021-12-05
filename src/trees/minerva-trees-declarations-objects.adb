@@ -21,7 +21,7 @@ package body Minerva.Trees.Declarations.Objects is
    is
    begin
       if This.Has_Initializer then
-         This.Initializer.Set_Type (This.Object_Type.Get_Type);
+         This.Initializer.Add_Possible_Type (This.Object_Type.Get_Type);
       end if;
 
       Parent (This).Check_Tree (Environment);
@@ -280,15 +280,8 @@ package body Minerva.Trees.Declarations.Objects is
       end Declare_Object;
 
    begin
-      This.Log
-        (Minerva.Environment.Environment_Name (Environment)
-         & ": start offset =" & Frame_Offset'Image);
       Parent (This.all).Elaborate_Tree (Environment);
       This.Names.Iterate (Declare_Object'Access);
-      This.Log
-        (Minerva.Environment.Environment_Name (Environment)
-         & ": start offset =" & Frame_Offset'Image);
-
       Minerva.Environment.Set_Frame_Offset (Environment, Frame_Offset);
 
    end Elaborate_Tree;
