@@ -1,5 +1,3 @@
-with Minerva.Logging;
-
 with Minerva.Types.Callable;
 
 package body Minerva.Trees.Expressions.Calls is
@@ -87,9 +85,13 @@ package body Minerva.Trees.Expressions.Calls is
             if not Is_Compatible (Call_Type.Argument (I).Entry_Type,
                                   Arg_Types (I))
             then
+               This.Log ("match " & Call_Type.Short_Name
+                         & ": failed at argument" & I'Image);
                return False;
             end if;
          end loop;
+         This.Log ("match " & Call_Type.Short_Name
+                   & ": success");
          return True;
       end Match;
 
@@ -98,13 +100,11 @@ package body Minerva.Trees.Expressions.Calls is
                         (Minerva.Types.Lists.Empty_List,
                          Environment);
    begin
-      Minerva.Logging.Log
-        (This.Image,
-         "constraining type");
+      This.Log
+        ("constraining type");
       for Possible_Type of Possible_Types loop
-         Minerva.Logging.Log
-           (This.Image,
-            "possible type: " & Possible_Type.Short_Name);
+         This.Log
+           ("possible type: " & Possible_Type.Short_Name);
          for Call_Type of Found_Types loop
             Check_Call_Type (To_Callable (Call_Type), Possible_Type);
          end loop;
@@ -221,13 +221,26 @@ package body Minerva.Trees.Expressions.Calls is
       This.Call.Push (Unit);
    end Push;
 
+   ------------------
+   -- Push_Address --
+   ------------------
+
+   overriding procedure Push_Address
+     (This : Instance;
+      Unit : in out Tagatha.Units.Tagatha_Unit)
+   is
+   begin
+      raise Constraint_Error with
+        "cannot push address of call";
+   end Push_Address;
+
    --------------
    -- Set_Type --
    --------------
 
    overriding procedure Set_Type
      (This          : in out Instance;
-      Possible_Type : Minerva.Types.Class_Reference)
+      Possible_Type : not null Minerva.Types.Class_Reference)
    is
       Found : Boolean := False;
    begin

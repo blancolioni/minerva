@@ -1,3 +1,5 @@
+--  Test that a record type declaration can be compiled
+--  Check .s file to make sure stack is properly reserved
 with Minerva.Tests;
 
 procedure Test_Record_1 is

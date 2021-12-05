@@ -46,6 +46,7 @@ private package Minerva.Types is
    function Is_Signed (This : Class) return Boolean;
    function Is_Universal (This : Class) return Boolean;
    function Is_Unsigned (This : Class) return Boolean;
+   function Is_Composite (This : Class) return Boolean;
 
    function Is_Floating_Point (This : Class) return Boolean;
 
@@ -63,6 +64,7 @@ private
          Definition        : Minerva.Trees.Class_Reference;
          Name              : Minerva.Names.Minerva_Name;
          Object_Size       : Minerva.Target.Object_Size := 0;
+         Is_Composite      : Boolean := False;
          Is_Enumerated     : Boolean := False;
          Is_Floating_Point : Boolean := False;
          Is_Integral       : Boolean := False;
@@ -88,6 +90,9 @@ private
      (This : Class)
       return Natural
    is (Minerva.Target.To_Word_Size (This.Object_Size));
+
+   function Is_Composite (This : Class) return Boolean
+   is (This.Is_Composite);
 
    function Is_Integral (This : Class) return Boolean
    is (This.Is_Integral);

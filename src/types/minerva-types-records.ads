@@ -27,7 +27,7 @@ private
 
    type Instance is new Parent with
       record
-         Components : Minerva.Environment.Environment_Id;
+         null;
       end record;
 
    overriding function Description

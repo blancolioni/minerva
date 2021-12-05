@@ -68,7 +68,7 @@ package body Minerva.Entries.Withs is
      (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
    is
    begin
-      raise Constraint_Error with "cannot push a package address";
+      null;
    end Push_Address;
 
 end Minerva.Entries.Withs;

@@ -53,6 +53,7 @@ package body Minerva.Types.Universal is
               Name              =>
                 Minerva.Names.To_Name ("universal-integer"),
               Object_Size       => 0,
+              Is_Composite      => False,
               Is_Enumerated     => True,
               Is_Floating_Point => False,
               Is_Integral       => False,
@@ -79,6 +80,7 @@ package body Minerva.Types.Universal is
               Name              =>
                 Minerva.Names.To_Name ("universal-float"),
               Object_Size       => 0,
+              Is_Composite      => False,
               Is_Enumerated     => False,
               Is_Floating_Point => True,
               Is_Integral       => False,
@@ -105,6 +107,7 @@ package body Minerva.Types.Universal is
               Name              =>
                 Minerva.Names.To_Name ("universal-integer"),
               Object_Size       => 0,
+              Is_Composite      => False,
               Is_Enumerated     => False,
               Is_Floating_Point => False,
               Is_Integral       => True,

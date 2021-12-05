@@ -8,7 +8,7 @@ package body Minerva.Trees.Expressions is
 
    procedure Add_Possible_Type
      (This          : in out Class;
-      Possible_Type : Minerva.Types.Class_Reference)
+      Possible_Type : not null Minerva.Types.Class_Reference)
    is
    begin
       if not This.Possible_Types.Contains (Possible_Type) then
@@ -192,7 +192,7 @@ package body Minerva.Trees.Expressions is
 
    procedure Set_Type
      (This          : in out Instance;
-      Possible_Type : Minerva.Types.Class_Reference)
+      Possible_Type : not null Minerva.Types.Class_Reference)
    is
    begin
       This.Possible_Types.Clear;

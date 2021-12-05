@@ -105,13 +105,25 @@ package body Minerva.Trees.Expressions.Identifiers is
       This.Get_Entry.Push (Unit);
    end Push;
 
+   ------------------
+   -- Push_Address --
+   ------------------
+
+   overriding procedure Push_Address
+     (This : Instance;
+      Unit : in out Tagatha.Units.Tagatha_Unit)
+   is
+   begin
+      This.Get_Entry.Push_Address (Unit);
+   end Push_Address;
+
    --------------
    -- Set_Type --
    --------------
 
    overriding procedure Set_Type
      (This          : in out Instance;
-      Possible_Type : Minerva.Types.Class_Reference)
+      Possible_Type : not null Minerva.Types.Class_Reference)
    is
       Found : Boolean := False;
    begin

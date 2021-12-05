@@ -59,9 +59,13 @@ package body Minerva.Entries.Value.Components is
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit)
    is
+      use Minerva.Target;
+      Offset : constant Natural :=
+                 This.Word_Offset
+                   * Natural (Target_Word_Size / 8);
    begin
       Unit.Push
-        (Tagatha.Tagatha_Integer (This.Word_Offset));
+        (Tagatha.Tagatha_Integer (Offset));
       Unit.Operate (Tagatha.Op_Add);
    end Push_Address;
 

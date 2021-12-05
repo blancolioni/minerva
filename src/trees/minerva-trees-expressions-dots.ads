@@ -35,6 +35,10 @@ private
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit);
 
+   overriding procedure Push_Address
+     (This : Instance;
+      Unit : in out Tagatha.Units.Tagatha_Unit);
+
    overriding procedure Pop
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit);
@@ -47,7 +51,7 @@ private
 
    overriding procedure Set_Type
      (This          : in out Instance;
-      Possible_Type : Minerva.Types.Class_Reference);
+      Possible_Type : not null Minerva.Types.Class_Reference);
 
    overriding function Is_Static
      (This        : Instance;

@@ -45,6 +45,10 @@ private
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit);
 
+   overriding procedure Push_Address
+     (This : Instance;
+      Unit : in out Tagatha.Units.Tagatha_Unit);
+
    overriding procedure Pop
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit);

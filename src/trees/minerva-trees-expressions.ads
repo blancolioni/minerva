@@ -32,6 +32,11 @@ package Minerva.Trees.Expressions is
       Unit : in out Tagatha.Units.Tagatha_Unit)
    is abstract;
 
+   procedure Push_Address
+     (This : Instance;
+      Unit : in out Tagatha.Units.Tagatha_Unit)
+   is abstract;
+
    procedure Pop
      (This : Instance;
       Unit : in out Tagatha.Units.Tagatha_Unit)
@@ -59,11 +64,11 @@ package Minerva.Trees.Expressions is
 
    procedure Add_Possible_Type
      (This          : in out Class;
-      Possible_Type : Minerva.Types.Class_Reference);
+      Possible_Type : not null Minerva.Types.Class_Reference);
 
    procedure Set_Type
      (This          : in out Instance;
-      Possible_Type : Minerva.Types.Class_Reference);
+      Possible_Type : not null Minerva.Types.Class_Reference);
 
    function Has_Type
      (This : Class)
