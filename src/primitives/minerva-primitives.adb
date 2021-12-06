@@ -19,6 +19,7 @@ package body Minerva.Primitives is
    Local_Boolean   : Minerva.Types.Class_Reference;
    Local_Character : Minerva.Types.Class_Reference;
    Local_Integer   : Minerva.Types.Class_Reference;
+   Local_Address   : Minerva.Types.Class_Reference;
 
    -----------------------
    -- Create_Primitives --
@@ -115,17 +116,18 @@ package body Minerva.Primitives is
          Minerva.Environment.Insert (Standard_Env, Word_Entry);
       end;
 
+      Local_Address :=
+        Minerva.Types.Constructors.Create_Modular_Type
+          (Definition => Standard_Tree,
+           Name       => "address",
+           Modulus    => 65536);
+
       declare
-         Address_Type  : constant Minerva.Types.Class_Reference :=
-                           Minerva.Types.Constructors.Create_Modular_Type
-                             (Definition => Standard_Tree,
-                              Name       => "address",
-                              Modulus    => 65536);
          Address_Entry : constant Minerva.Entries.Types.Class_Reference :=
                            Minerva.Entries.Types.Create
                              (Declaration => Standard_Tree,
                               Name        => +"address",
-                              Definition  => Address_Type);
+                              Definition  => Local_Address);
       begin
          Minerva.Environment.Insert (Standard_Env, Address_Entry);
       end;
@@ -261,5 +263,27 @@ package body Minerva.Primitives is
    begin
       return Standard_Env;
    end Standard_Environment;
+
+   ----------------------
+   -- Standard_Integer --
+   ----------------------
+
+   function Standard_Integer
+     return Minerva.Types.Class_Reference
+   is
+   begin
+      return Local_Integer;
+   end Standard_Integer;
+
+   --------------------
+   -- System_Address --
+   --------------------
+
+   function System_Address
+     return Minerva.Types.Class_Reference
+   is
+   begin
+      return Local_Address;
+   end System_Address;
 
 end Minerva.Primitives;

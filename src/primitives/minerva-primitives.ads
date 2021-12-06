@@ -18,4 +18,10 @@ private package Minerva.Primitives is
    function Standard_Character
      return Minerva.Types.Class_Reference;
 
+   function Standard_Integer
+     return Minerva.Types.Class_Reference;
+
+   function System_Address
+     return Minerva.Types.Class_Reference;
+
 end Minerva.Primitives;
