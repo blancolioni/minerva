@@ -1,3 +1,5 @@
+with Minerva.Primitives;
+
 package body Minerva.Trees.Aspects is
 
    ----------------
@@ -83,6 +85,10 @@ package body Minerva.Trees.Aspects is
       use type Minerva.Trees.Expressions.Class_Reference;
    begin
       if This.Value /= null then
+         if Minerva.Names.Standard_Text (This.Name) = "address" then
+            This.Value.Add_Possible_Type
+              (Minerva.Primitives.System_Address);
+         end if;
          This.Value.Elaborate (Environment);
          This.Value.Check (Environment);
       end if;
