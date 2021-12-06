@@ -1,7 +1,7 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Doubly_Linked_Lists;
 
-with Minerva.Logging;
+--  with Minerva.Logging;
 with Minerva.Operators;
 
 --  with Minerva.Entries.Value.Components;
@@ -261,7 +261,7 @@ package body Minerva.Environment is
       Env : Minerva.Ids.Environment_Id := Environment;
       Base_Name : constant Minerva.Names.Minerva_Name :=
                     Minerva.Names.Base_Name (Name);
-      Recurse   : Boolean := Recursive;
+      --  Recurse   : Boolean := Recursive;
    begin
       for Prefix of Minerva.Names.Qualifiers (Name) loop
          if not Exists (Env, Prefix) then
@@ -277,20 +277,27 @@ package body Minerva.Environment is
             Env :=
               Minerva.Entries.Withs.Constant_Class_Reference (Prefix_Entry)
               .Child_Environment;
-            Recurse := False;
+            --  Recurse := False;
          end;
       end loop;
 
-      declare
-         Rec      : Environment_Record renames
-                      Environment_Table (Environment);
-         Position : constant Entry_Lists.Cursor :=
-                      Find (Rec.Entries, Base_Name);
-      begin
-         return Entry_Lists.Has_Element (Position)
-           or else (Recurse and then Rec.Parent /= Null_Environment_Id
-                    and then Exists (Rec.Parent, Base_Name, Recurse));
-      end;
+      loop
+         declare
+            Rec      : Environment_Record renames
+                         Environment_Table (Env);
+            Position : constant Entry_Lists.Cursor :=
+                         Find (Rec.Entries, Base_Name);
+         begin
+            if Entry_Lists.Has_Element (Position) then
+               return True;
+            elsif Recursive and then Rec.Parent /= Null_Environment_Id then
+               Env := Rec.Parent;
+            else
+               return False;
+            end if;
+         end;
+      end loop;
+
    end Exists;
 
    ------------
@@ -341,7 +348,7 @@ package body Minerva.Environment is
       Env       : Minerva.Ids.Environment_Id := Environment;
       Base_Name : constant Minerva.Names.Minerva_Name :=
                     Minerva.Names.Base_Name (Name);
-      Recurse   : Boolean := Recursive;
+      --  Recurse   : Boolean := Recursive;
    begin
       for Prefix of Minerva.Names.Qualifiers (Name) loop
          pragma Assert (Exists (Env, Prefix),
@@ -355,23 +362,27 @@ package body Minerva.Environment is
             Env :=
               Minerva.Entries.Withs.Constant_Class_Reference (Prefix_Entry)
               .Child_Environment;
-            Recurse := False;
+            --  Recurse := False;
          end;
       end loop;
 
-      declare
-         Rec      : Environment_Record renames
-                      Environment_Table (Environment);
-         Position : constant Entry_Lists.Cursor :=
-                      Find (Rec.Entries, Base_Name);
-      begin
-         if Entry_Lists.Has_Element (Position) then
-            return Entry_Lists.Element (Position);
-         else
-            pragma Assert (Recurse, "environment.get: precondition violated");
-            return Get (Rec.Parent, Name, Recurse);
-         end if;
-      end;
+      loop
+         declare
+            Rec      : Environment_Record renames
+                         Environment_Table (Env);
+            Position : constant Entry_Lists.Cursor :=
+                         Find (Rec.Entries, Base_Name);
+         begin
+            if Entry_Lists.Has_Element (Position) then
+               return Entry_Lists.Element (Position);
+            elsif Recursive and then Rec.Parent /= Null_Environment_Id then
+               Env := Rec.Parent;
+            else
+               raise Constraint_Error with "precondition violated";
+            end if;
+         end;
+      end loop;
+
    end Get;
 
    ---------
@@ -423,10 +434,6 @@ package body Minerva.Environment is
       Env      : Environment_Record renames
                    Environment_Table (Environment);
    begin
-      Minerva.Logging.Log
-        ("looking for '" & Minerva.Names.Cased_Text (Name)
-         & "' in environment '" & Minerva.Names.Cased_Text (Env.Name)
-         & "'");
       for Item of Env.Entries loop
          if Item.Name = Name
            and then Matches (Item)
