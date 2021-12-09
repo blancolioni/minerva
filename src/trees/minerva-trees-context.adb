@@ -120,6 +120,8 @@ package body Minerva.Trees.Context is
      (This        : not null access Instance;
       Environment : Minerva.Environment.Environment_Id)
    is
+      subtype With_Reference is
+        Minerva.Entries.Withs.Constant_Class_Reference;
    begin
       if This.Context_Clause = With_Context then
          for Spec of This.Library_Specs loop
@@ -134,8 +136,7 @@ package body Minerva.Trees.Context is
 
          declare
             use Minerva.Entries.Withs;
-            subtype With_Reference is
-              Minerva.Entries.Withs.Constant_Class_Reference;
+
             With_Entry : With_Reference := null;
             Env        : Minerva.Environment.Environment_Id := Environment;
 
@@ -192,6 +193,29 @@ package body Minerva.Trees.Context is
                end;
             end loop;
          end;
+      else
+         if Minerva.Environment.Exists
+           (Environment, This.Name)
+         then
+            declare
+               E : constant Minerva.Entries.Constant_Class_Reference :=
+                     Minerva.Environment.Get (Environment, This.Name);
+            begin
+               if E.Is_Package_Reference then
+                  Minerva.Environment.Use_Environment
+                    (Environment      => Environment,
+                     Used_Environment =>
+                       (With_Reference (E).Child_Environment));
+               else
+                  This.Add_Error
+                    ("expected-but-found,package-name,"
+                     & Minerva.Names.Cased_Text (This.Name));
+               end if;
+            end;
+         else
+            This.Add_Error ("undefined,"
+                            & Minerva.Names.Cased_Text (This.Name));
+         end if;
       end if;
    end Elaborate_Tree;
 
