@@ -214,7 +214,7 @@ package body Minerva.Trees.Declarations.Objects is
          Name               : constant Minerva.Names.Minerva_Name :=
                                 Name_Node.Name;
       begin
-         if Minerva.Environment.Exists (Environment, Name, False) then
+         if Minerva.Environment.Exists_Locally (Environment, Name) then
             This.Add_Error
               ("redeclaration,"
                & Minerva.Names.Cased_Text (Name));
