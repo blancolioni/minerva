@@ -62,7 +62,8 @@ package body Minerva.Trees.Types.Records is
 
       This.Tree_Type :=
         Minerva.Types.Class_Reference
-          (Minerva.Types.Records.Create (This, Record_Env));
+          (Minerva.Types.Records.Create
+             (This, This.Defining_Name, Record_Env));
    end Elaborate_Tree;
 
    -----------

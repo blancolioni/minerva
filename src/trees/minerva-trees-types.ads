@@ -1,3 +1,4 @@
+with Minerva.Names;
 with Minerva.Types;
 
 package Minerva.Trees.Types is
@@ -11,6 +12,10 @@ package Minerva.Trees.Types is
    type Reference is access all Instance;
    type Class_Reference is access all Class;
 
+   procedure Set_Defining_Name
+     (This : in out Class;
+      Name : Minerva.Names.Minerva_Name);
+
    function Get_Type (This : Class) return Minerva.Types.Class_Reference;
 
 private
@@ -19,7 +24,8 @@ private
 
    type Instance is abstract new Parent with
       record
-         Tree_Type : Minerva.Types.Class_Reference := null;
+         Defining_Name : Minerva.Names.Minerva_Name;
+         Tree_Type     : Minerva.Types.Class_Reference := null;
       end record;
 
    function Get_Type (This : Class) return Minerva.Types.Class_Reference

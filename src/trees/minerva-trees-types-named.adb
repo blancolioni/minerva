@@ -52,7 +52,7 @@ package body Minerva.Trees.Types.Named is
                    else null);
    begin
       if not Exists then
-         This.Add_Error ("undefined");
+         This.Add_Error ("undefined," & Minerva.Names.Cased_Text (This.Name));
          This.Tree_Type := Minerva.Primitives.Standard_Boolean;
       elsif not Element.Is_Type_Entry then
          This.Add_Error ("subtype-mark-required");

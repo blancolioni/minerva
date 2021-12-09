@@ -58,6 +58,8 @@ package body Minerva.Trees.Declarations.Types is
       Environment : Minerva.Environment.Environment_Id)
    is
    begin
+      This.Type_Definition.Set_Defining_Name
+        (This.Type_Name);
       This.Type_Definition.Elaborate (Environment);
       This.Set_Entry
         (Minerva.Entries.Types.Create

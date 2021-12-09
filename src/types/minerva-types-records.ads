@@ -1,4 +1,5 @@
 with Minerva.Environment;
+with Minerva.Names;
 
 with Minerva.Types.Composite;
 
@@ -18,6 +19,7 @@ package Minerva.Types.Records is
 
    function Create
      (Definition            : not null access Minerva.Trees.Class;
+      Name                  : Minerva.Names.Minerva_Name;
       Component_Environment : Minerva.Environment.Environment_Id)
       return Class_Reference;
 
