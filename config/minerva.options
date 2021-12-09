@@ -1,6 +1,8 @@
 package Minerva.Options is
 
-	Execute       : Boolean := False;
-	Write_Listing : Boolean := False;
+	Execute           : Boolean := False;
+	Trace_Environment : Boolean := False;
+	Trace_Stages      : Boolean := False;
+	Write_Listing     : Boolean := False;
 	
 end Minerva.Options;

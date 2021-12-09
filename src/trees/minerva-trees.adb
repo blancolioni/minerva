@@ -2,6 +2,7 @@ with Ada.Text_IO;
 
 with Minerva.Entries;
 with Minerva.Logging;
+with Minerva.Options;
 
 package body Minerva.Trees is
 
@@ -30,7 +31,10 @@ package body Minerva.Trees is
       Environment : Minerva.Environment.Environment_Id)
    is
    begin
-      This.Log ("checking");
+      if Minerva.Options.Trace_Stages then
+         This.Log ("checking");
+      end if;
+
       This.Check_Tree (Environment);
       This.Checked := True;
    end Check;
@@ -45,7 +49,6 @@ package body Minerva.Trees is
    is
    begin
       for Child of Dispatch (This).Children loop
-         Child.Log ("checking child");
          Child.Check (Environment);
       end loop;
    end Check_Tree;
@@ -59,7 +62,10 @@ package body Minerva.Trees is
       Unit : in out Tagatha.Units.Tagatha_Unit)
    is
    begin
-      This.Log ("compiling");
+      if Minerva.Options.Trace_Stages then
+         This.Log ("compiling");
+      end if;
+
       This.Compile_Tree (Unit);
    end Compile;
 
@@ -72,7 +78,9 @@ package body Minerva.Trees is
       Environment : Minerva.Environment.Environment_Id)
    is
    begin
-      This.Log ("elaborating");
+      if Minerva.Options.Trace_Stages then
+         This.Log ("elaborating");
+      end if;
       This.Elaborate_Tree (Environment);
       This.Elaborated := True;
    end Elaborate;
@@ -87,7 +95,6 @@ package body Minerva.Trees is
    is
    begin
       for Child of Dispatch (This.all).Children loop
-         Child.Log ("elaborating child");
          Child.Elaborate (Environment);
       end loop;
    end Elaborate_Tree;

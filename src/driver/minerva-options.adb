@@ -10,6 +10,18 @@ package body Minerva.Options is
                ("execute", ' ');
    end Execute;
 
+   function Trace_Environment return Boolean is
+   begin
+      return WL.Command_Line.Find_Option
+               ("trace-environment", ' ');
+   end Trace_Environment;
+
+   function Trace_Stages return Boolean is
+   begin
+      return WL.Command_Line.Find_Option
+               ("trace-stages", ' ');
+   end Trace_Stages;
+
    function Write_Listing return Boolean is
    begin
       return WL.Command_Line.Find_Option
