@@ -131,9 +131,14 @@ package body Minerva.Trees.Declarations.Subprograms is
      (This        : not null access Instance;
       Environment : Minerva.Environment.Environment_Id)
    is
+      use type Minerva.Trees.Types.Class_Reference;
    begin
       if This.Has_Context then
          This.Context.Elaborate (Environment);
+      end if;
+
+      if This.Return_Type /= null then
+         This.Return_Type.Elaborate (Environment);
       end if;
 
       This.Argument_Env :=
@@ -146,8 +151,6 @@ package body Minerva.Trees.Declarations.Subprograms is
       This.Formal_Arguments.Elaborate (This.Argument_Env);
 
       declare
-         use type Minerva.Trees.Types.Class_Reference;
-
          subtype Call_Reference is
            Minerva.Types.Callable.Class_Reference;
          subtype Formal_Argument_Array is
