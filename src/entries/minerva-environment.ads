@@ -13,29 +13,30 @@ private package Minerva.Environment is
 
    function Exists
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : String;
-      Recursive   : Boolean := True)
+      Name        : String)
       return Boolean;
 
    function Exists
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : Minerva.Names.Minerva_Name;
-      Recursive   : Boolean := True)
+      Name        : Minerva.Names.Minerva_Name)
+      return Boolean;
+
+   function Exists_Locally
+     (Environment : Minerva.Ids.Environment_Id;
+      Name        : Minerva.Names.Minerva_Name)
       return Boolean;
 
    function Get
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : String;
-      Recursive   : Boolean := True)
+      Name        : String)
       return Minerva.Entries.Constant_Class_Reference
-     with Pre => Exists (Environment, Name, Recursive);
+     with Pre => Exists (Environment, Name);
 
    function Get
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : Minerva.Names.Minerva_Name;
-      Recursive   : Boolean := True)
+      Name        : Minerva.Names.Minerva_Name)
       return Minerva.Entries.Constant_Class_Reference
-     with Pre => Exists (Environment, Name, Recursive);
+     with Pre => Exists (Environment, Name);
 
    procedure Iterate_Matches
      (Environment : Minerva.Ids.Environment_Id;
@@ -57,6 +58,10 @@ private package Minerva.Environment is
    procedure Insert
      (Environment : Minerva.Ids.Environment_Id;
       Element     : not null access constant Minerva.Entries.Instance'Class);
+
+   procedure Use_Environment
+     (Environment      : Environment_Id;
+      Used_Environment : Environment_Id);
 
    function Current_Frame_Offset
      (Environment : Minerva.Ids.Environment_Id)

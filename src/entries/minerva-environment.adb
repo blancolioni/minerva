@@ -1,10 +1,10 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Doubly_Linked_Lists;
 
---  with Minerva.Logging;
+with Minerva.Logging;
+
 with Minerva.Operators;
 
---  with Minerva.Entries.Value.Components;
 with Minerva.Entries.Value.Formal_Arguments;
 with Minerva.Entries.Subprograms;
 with Minerva.Entries.Withs;
@@ -22,15 +22,25 @@ package body Minerva.Environment is
      new Ada.Containers.Doubly_Linked_Lists
        (Minerva.Entries.Constant_Class_Reference, Minerva.Entries."=");
 
+   package Environment_Lists is
+     new Ada.Containers.Doubly_Linked_Lists
+       (Minerva.Ids.Environment_Id, Minerva.Ids."=");
+
    function Find
      (List : Entry_Lists.List;
       Name : Minerva.Names.Minerva_Name)
+      return Entry_Lists.Cursor;
+
+   function Find
+     (Environment : Minerva.Ids.Environment_Id;
+      Name        : Minerva.Names.Minerva_Name)
       return Entry_Lists.Cursor;
 
    type Environment_Record is
       record
          Name         : Minerva.Names.Minerva_Name;
          Parent       : Minerva.Ids.Environment_Id_Base;
+         Used         : Environment_Lists.List;
          Entries      : Entry_Lists.List;
          Frame_Offset : Natural := 0;
       end record;
@@ -55,6 +65,11 @@ package body Minerva.Environment is
    --  is
    --  begin
    --  end Add;
+
+   procedure Log
+     (Environment : Environment_Id;
+      Message     : String)
+     with Unreferenced;
 
    ----------------
    -- Add_Parent --
@@ -214,6 +229,7 @@ package body Minerva.Environment is
       Env : constant Environment_Record := Environment_Record'
         (Name         => Minerva.Names.To_Name ("standard"),
          Parent       => Minerva.Ids.Null_Environment_Id,
+         Used         => <>,
          Entries      => <>,
          Frame_Offset => 0);
    begin
@@ -253,51 +269,11 @@ package body Minerva.Environment is
 
    function Exists
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : Minerva.Names.Minerva_Name;
-      Recursive   : Boolean := True)
+      Name        : Minerva.Names.Minerva_Name)
       return Boolean
    is
-      use Minerva.Ids;
-      Env : Minerva.Ids.Environment_Id := Environment;
-      Base_Name : constant Minerva.Names.Minerva_Name :=
-                    Minerva.Names.Base_Name (Name);
-      --  Recurse   : Boolean := Recursive;
    begin
-      for Prefix of Minerva.Names.Qualifiers (Name) loop
-         if not Exists (Env, Prefix) then
-            return False;
-         end if;
-         declare
-            Prefix_Entry : constant Minerva.Entries.Constant_Class_Reference :=
-                             Get (Env, Prefix);
-         begin
-            if not Prefix_Entry.Is_Package_Reference then
-               return False;
-            end if;
-            Env :=
-              Minerva.Entries.Withs.Constant_Class_Reference (Prefix_Entry)
-              .Child_Environment;
-            --  Recurse := False;
-         end;
-      end loop;
-
-      loop
-         declare
-            Rec      : Environment_Record renames
-                         Environment_Table (Env);
-            Position : constant Entry_Lists.Cursor :=
-                         Find (Rec.Entries, Base_Name);
-         begin
-            if Entry_Lists.Has_Element (Position) then
-               return True;
-            elsif Recursive and then Rec.Parent /= Null_Environment_Id then
-               Env := Rec.Parent;
-            else
-               return False;
-            end if;
-         end;
-      end loop;
-
+      return Entry_Lists.Has_Element (Find (Environment, Name));
    end Exists;
 
    ------------
@@ -306,14 +282,27 @@ package body Minerva.Environment is
 
    function Exists
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : String;
-      Recursive   : Boolean := True)
+      Name        : String)
       return Boolean
    is
    begin
       return Exists
-        (Environment, Minerva.Names.To_Name (Name), Recursive);
+        (Environment, Minerva.Names.To_Name (Name));
    end Exists;
+
+   --------------------
+   -- Exists_Locally --
+   --------------------
+
+   function Exists_Locally
+     (Environment : Minerva.Ids.Environment_Id;
+      Name        : Minerva.Names.Minerva_Name)
+      return Boolean
+   is
+   begin
+      return Entry_Lists.Has_Element
+        (Find (Environment_Table (Environment).Entries, Name));
+   end Exists_Locally;
 
    ----------
    -- Find --
@@ -334,35 +323,41 @@ package body Minerva.Environment is
       return Entry_Lists.No_Element;
    end Find;
 
-   ---------
-   -- Get --
-   ---------
+   ----------
+   -- Find --
+   ----------
 
-   function Get
+   function Find
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : Minerva.Names.Minerva_Name;
-      Recursive   : Boolean := True)
-      return Minerva.Entries.Constant_Class_Reference
+      Name        : Minerva.Names.Minerva_Name)
+      return Entry_Lists.Cursor
    is
       use Minerva.Ids;
       Env       : Minerva.Ids.Environment_Id := Environment;
       Base_Name : constant Minerva.Names.Minerva_Name :=
                     Minerva.Names.Base_Name (Name);
-      --  Recurse   : Boolean := Recursive;
+
    begin
       for Prefix of Minerva.Names.Qualifiers (Name) loop
-         pragma Assert (Exists (Env, Prefix),
-                        "environment.get: prefix does not exist");
          declare
-            Prefix_Entry : constant Minerva.Entries.Constant_Class_Reference :=
-                             Get (Env, Prefix);
+            Prefix_Position : constant Entry_Lists.Cursor :=
+                                Find (Env, Prefix);
          begin
-            pragma Assert (Prefix_Entry.Is_Package_Reference,
-                           "environment.get: prefix is not package reference");
-            Env :=
-              Minerva.Entries.Withs.Constant_Class_Reference (Prefix_Entry)
-              .Child_Environment;
-            --  Recurse := False;
+            if not Entry_Lists.Has_Element (Prefix_Position) then
+               return Entry_Lists.No_Element;
+            end if;
+
+            declare
+               Prefix_Entry : constant Entries.Constant_Class_Reference :=
+                                Entry_Lists.Element (Prefix_Position);
+            begin
+               if not Prefix_Entry.Is_Package_Reference then
+                  return Entry_Lists.No_Element;
+               end if;
+               Env :=
+                 Entries.Withs.Constant_Class_Reference (Prefix_Entry)
+                 .Child_Environment;
+            end;
          end;
       end loop;
 
@@ -374,15 +369,45 @@ package body Minerva.Environment is
                          Find (Rec.Entries, Base_Name);
          begin
             if Entry_Lists.Has_Element (Position) then
-               return Entry_Lists.Element (Position);
-            elsif Recursive and then Rec.Parent /= Null_Environment_Id then
-               Env := Rec.Parent;
+               return Position;
             else
-               raise Constraint_Error with "precondition violated";
+               for E of Rec.Used loop
+                  declare
+                     Use_Position : constant Entry_Lists.Cursor :=
+                                      Find (E, Base_Name);
+                  begin
+                     if Entry_Lists.Has_Element (Use_Position) then
+                        return Use_Position;
+                     end if;
+                  end;
+               end loop;
+
+               if Rec.Parent /= Null_Environment_Id then
+                  Env := Rec.Parent;
+               else
+                  return Entry_Lists.No_Element;
+               end if;
             end if;
          end;
       end loop;
 
+   end Find;
+
+   ---------
+   -- Get --
+   ---------
+
+   function Get
+     (Environment : Minerva.Ids.Environment_Id;
+      Name        : Minerva.Names.Minerva_Name)
+      return Minerva.Entries.Constant_Class_Reference
+   is
+      Position : constant Entry_Lists.Cursor :=
+                   Find (Environment, Name);
+      pragma Assert (Entry_Lists.Has_Element (Position),
+                     "violated precondition");
+   begin
+      return Entry_Lists.Element (Position);
    end Get;
 
    ---------
@@ -391,13 +416,12 @@ package body Minerva.Environment is
 
    function Get
      (Environment : Minerva.Ids.Environment_Id;
-      Name        : String;
-      Recursive   : Boolean := True)
+      Name        : String)
       return Minerva.Entries.Constant_Class_Reference
    is
    begin
       return Get
-        (Environment, Minerva.Names.To_Name (Name), Recursive);
+        (Environment, Minerva.Names.To_Name (Name));
    end Get;
 
    ------------
@@ -429,23 +453,44 @@ package body Minerva.Environment is
       Process     : not null access
         procedure (Found_Entry : Minerva.Entries.Constant_Class_Reference))
    is
-      use Minerva.Ids;
-      use type Minerva.Names.Minerva_Name;
-      Env      : Environment_Record renames
-                   Environment_Table (Environment);
-   begin
-      for Item of Env.Entries loop
-         if Item.Name = Name
-           and then Matches (Item)
-         then
-            Process (Item);
+      Checked : Environment_Lists.List;
+
+      procedure Iterate (Env : Minerva.Ids.Environment_Id);
+
+      -------------
+      -- Iterate --
+      -------------
+
+      procedure Iterate (Env : Minerva.Ids.Environment_Id) is
+         use Minerva.Ids;
+         use type Minerva.Names.Minerva_Name;
+         Rec : Environment_Record renames
+                 Environment_Table (Env);
+      begin
+         if Checked.Contains (Env) then
+            return;
          end if;
-      end loop;
 
-      if Env.Parent /= Null_Environment_Id then
-         Iterate_Matches (Env.Parent, Name, Matches, Process);
-      end if;
+         Checked.Append (Env);
+         for Item of Rec.Entries loop
+            if Item.Name = Name
+              and then Matches (Item)
+            then
+               Process (Item);
+            end if;
+         end loop;
 
+         if Rec.Parent /= Null_Environment_Id then
+            Iterate (Rec.Parent);
+         end if;
+
+         for E of Rec.Used loop
+            Iterate (E);
+         end loop;
+      end Iterate;
+
+   begin
+      Iterate (Environment);
    end Iterate_Matches;
 
    -------------------
@@ -473,6 +518,20 @@ package body Minerva.Environment is
       end if;
    end Iterate_Names;
 
+   ---------
+   -- Log --
+   ---------
+
+   procedure Log
+     (Environment : Environment_Id;
+      Message     : String)
+   is
+   begin
+      Minerva.Logging.Log
+        (Category => Environment_Name (Environment),
+         Message  => Message);
+   end Log;
+
    ------------
    -- Parent --
    ------------
@@ -496,5 +555,17 @@ package body Minerva.Environment is
    begin
       Environment_Table (Environment).Frame_Offset := New_Offset;
    end Set_Frame_Offset;
+
+   ---------------------
+   -- Use_Environment --
+   ---------------------
+
+   procedure Use_Environment
+     (Environment      : Environment_Id;
+      Used_Environment : Environment_Id)
+   is
+   begin
+      Environment_Table (Environment).Used.Append (Used_Environment);
+   end Use_Environment;
 
 end Minerva.Environment;
