@@ -244,9 +244,18 @@ package body Minerva.Parser.Subprograms is
       pragma Assert (Tok in Tok_Function | Tok_Procedure);
       Scan;
 
-      if Tok /= Tok_Identifier then
+      if Tok /= Tok_Identifier and then Tok /= Tok_String_Constant then
          Error ("expected a name");
          return null;
+      end if;
+
+      if Tok = Tok_String_Constant then
+         if not Is_Function then
+            Error ("operators-must-be-functions");
+         end if;
+         if Context /= null then
+            Error ("operators-cannot-be-top-level");
+         end if;
       end if;
 
       declare
@@ -258,7 +267,8 @@ package body Minerva.Parser.Subprograms is
                     else Identifiers.Parse_Qualified_Identifier);
       begin
          if Context = null then
-            pragma Assert (Tok = Tok_Identifier);
+            pragma Assert
+              (Tok = Tok_Identifier or else Tok = Tok_String_Constant);
             Scan;
          end if;
 
