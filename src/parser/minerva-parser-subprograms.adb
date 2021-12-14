@@ -137,6 +137,15 @@ package body Minerva.Parser.Subprograms is
                This.Append (Argument);
             end if;
          end;
+         if Tok = Tok_Semicolon then
+            Scan;
+         elsif Tok = Tok_Identifier then
+            Error ("missing ';'");
+         elsif Tok /= Tok_Right_Paren then
+            Error ("missing ')'");
+            Skip_To ((Tok_Semicolon, Tok_Return, Tok_Is));
+            return;
+         end if;
       end loop;
 
       if Tok = Tok_Right_Paren then
