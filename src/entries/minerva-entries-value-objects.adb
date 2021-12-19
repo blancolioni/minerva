@@ -137,7 +137,9 @@ package body Minerva.Entries.Value.Objects is
          Unit.Push_Local
            (Offset => This.Local,
             Data   => Tagatha.Address_Data);
-         Unit.Dereference;
+         Unit.Dereference
+           (Data => This.Data_Type,
+            Size => This.Size);
       else
          Unit.Push_Local
            (Offset => This.Local,
