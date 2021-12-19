@@ -66,6 +66,10 @@ package body Minerva.Trees is
          This.Log ("compiling");
       end if;
 
+      Unit.Source_Location
+        (Line   => GCS.Positions.Get_Line (This.Position),
+         Column => GCS.Positions.Get_Column (This.Position));
+
       This.Compile_Tree (Unit);
    end Compile;
 
