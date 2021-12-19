@@ -162,11 +162,12 @@ package body Minerva.Trees.Declarations.Packages is
          This.Parent_Entry := Parent_Tree.Get_Entry;
       end if;
 
-      This.Context.Elaborate (Environment);
-
       This.Environment :=
         Minerva.Environment.Create_Environment
           (This.Defining_Name, Environment);
+
+      This.Context.Elaborate (This.Environment);
+
       This.Set_Entry
         (Minerva.Entries.Class_Reference
           (Minerva.Entries.Packages.Create
