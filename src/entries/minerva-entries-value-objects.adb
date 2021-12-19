@@ -97,20 +97,25 @@ package body Minerva.Entries.Value.Objects is
            (Address  => This.Static_Address'Image,
             Data     => This.Data_Type,
             Size     => This.Size);
-      elsif This.Has_Address and then This.Variable_State.all then
-         Unit.Push_Local
-           (Offset => This.Local,
-            Data   => Tagatha.Address_Data,
-            Size   => Tagatha.Default_Address_Size);
-         Unit.Store (This.Size);
+      elsif This.Has_Address then
+         if This.Variable_State.all then
+            Unit.Push_Local
+              (Offset => This.Local,
+               Data   => Tagatha.Address_Data,
+               Size   => Tagatha.Default_Address_Size);
+            Unit.Store (This.Size);
+         else
+            Unit.Pop_Local
+              (Offset => This.Local,
+               Data   => This.Data_Type,
+               Size   => Tagatha.Default_Address_Size);
+            This.Variable_State.all := True;
+         end if;
       else
          Unit.Pop_Local
            (Offset => This.Local,
             Data   => This.Data_Type,
             Size   => This.Size);
-         if This.Variable_State /= null then
-            This.Variable_State.all := True;
-         end if;
       end if;
    end Pop;
 
