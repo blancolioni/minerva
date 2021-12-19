@@ -130,7 +130,7 @@ package body Minerva.Entries.Value.Objects is
    begin
       if This.Has_Static_Address then
          Unit.Push_Label
-           (Label_Name => This.Address'Image,
+           (Label_Name => This.Static_Address'Image,
             Data       => This.Data_Type,
             Size       => This.Size);
       elsif This.Has_Address then
