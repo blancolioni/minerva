@@ -27,8 +27,13 @@ package body Minerva.Operators is
      (Name : Minerva.Names.Minerva_Name)
       return Minerva_Operator
    is
+      N : constant String := Minerva.Names.Standard_Text (Name);
    begin
-      return Name_Op_Map (Minerva.Names.Standard_Text (Name));
+      if Name_Op_Map.Contains (N) then
+         return Name_Op_Map (N);
+      else
+         return Op_None;
+      end if;
    end Get_Operator;
 
 begin

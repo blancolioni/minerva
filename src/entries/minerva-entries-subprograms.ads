@@ -22,13 +22,15 @@ package Minerva.Entries.Subprograms is
    function Create
      (Declaration      : not null access Minerva.Trees.Class;
       Subprogram_Name  : Minerva.Names.Minerva_Name;
+      Environment_Name : Minerva.Names.Minerva_Name;
       Call_Type        : not null Minerva.Types.Callable.Class_Reference)
       return Class_Reference;
 
    function Create_Operator_Function
-     (Declaration    : not null access Minerva.Trees.Class;
-      Operator       : Minerva.Operators.Minerva_Operator;
-      Call_Type      : not null Minerva.Types.Callable.Class_Reference)
+     (Declaration      : not null access Minerva.Trees.Class;
+      Operator         : Minerva.Operators.Minerva_Operator;
+      Environment_Name : Minerva.Names.Minerva_Name;
+      Call_Type        : not null Minerva.Types.Callable.Class_Reference)
       return Class_Reference;
 
 private
@@ -61,9 +63,11 @@ private
       Unit : in out Tagatha.Units.Tagatha_Unit);
 
    procedure Initialize_Subprogram
-     (This        : in out Class;
-      Declaration : not null access Minerva.Trees.Class;
-      Name        : Minerva.Names.Minerva_Name;
-      Call_Type   : not null Minerva.Types.Callable.Class_Reference);
+     (This             : in out Class;
+      Declaration      : not null access Minerva.Trees.Class;
+      Environment_Name : Minerva.Names.Minerva_Name;
+      Name             : Minerva.Names.Minerva_Name;
+      Link_Name        : Minerva.Names.Minerva_Name;
+      Call_Type        : not null Minerva.Types.Callable.Class_Reference);
 
 end Minerva.Entries.Subprograms;

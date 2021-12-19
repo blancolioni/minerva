@@ -2,6 +2,8 @@ private package Minerva.Names is
 
    type Minerva_Name is private;
 
+   Null_Minerva_Name : constant Minerva_Name;
+
    function To_Name
      (Id             : String;
       Case_Sensitive : Boolean := False)
@@ -76,6 +78,8 @@ private
       record
          Index : Minerva_Name_Index := 0;
       end record;
+
+   Null_Minerva_Name : constant Minerva_Name := (Index => 0);
 
    function Is_Empty
      (Name : Minerva_Name)

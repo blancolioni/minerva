@@ -58,6 +58,8 @@ package body Minerva.Entries is
       Entry_Type           : access constant Minerva.Types.Class := null;
       Initializer          : access Minerva.Trees.Expressions.Instance'Class
       := null;
+      Link_Name            : Minerva.Names.Minerva_Name :=
+        Minerva.Names.Null_Minerva_Name;
       Is_Intrinsic         : Boolean := False;
       Is_Package_Entry     : Boolean := False;
       Is_Package_Reference : Boolean := False;
@@ -83,6 +85,8 @@ package body Minerva.Entries is
            Has_Static_Address   => Has_Static_Address,
            Has_Initializer      => Has_Initializer);
       This.Name := Declared_Name;
+      This.Link_Name := (if Minerva.Names.Is_Empty (Link_Name)
+                         then Declared_Name else Link_Name);
       This.Declaration := Tree_Reference (Declaration);
       This.Entry_Type := Minerva.Types.Class_Reference (Entry_Type);
       This.Initializer := Expression_Reference (Initializer);
@@ -164,7 +168,7 @@ package body Minerva.Entries is
    function Link_Name (This : Class) return String is
    begin
       return Minerva.Names.To_String
-        (Name       => This.Name,
+        (Name       => This.Link_Name,
          Separator  => "__",
          Lower_Case => True);
    end Link_Name;

@@ -11,6 +11,10 @@ private package Minerva.Environment is
      (Environment : Minerva.Ids.Environment_Id)
       return String;
 
+   function Environment_Name
+     (Environment : Minerva.Ids.Environment_Id)
+      return Minerva.Names.Minerva_Name;
+
    function Exists
      (Environment : Minerva.Ids.Environment_Id;
       Name        : String)

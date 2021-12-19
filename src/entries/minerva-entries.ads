@@ -115,6 +115,8 @@ private package Minerva.Entries is
       Entry_Type           : access constant Minerva.Types.Class := null;
       Initializer          : access Minerva.Trees.Expressions.Instance'Class
       := null;
+      Link_Name            : Minerva.Names.Minerva_Name :=
+        Minerva.Names.Null_Minerva_Name;
       Is_Intrinsic         : Boolean := False;
       Is_Package_Entry     : Boolean := False;
       Is_Package_Reference : Boolean := False;
@@ -152,6 +154,7 @@ private
      abstract new Minerva.Names.Name_Interface with
       record
          Name               : Minerva.Names.Minerva_Name;
+         Link_Name          : Minerva.Names.Minerva_Name;
          Declaration        : Tree_Reference;
          Entry_Type         : Minerva.Types.Class_Reference;
          Flags              : Entry_Flags;

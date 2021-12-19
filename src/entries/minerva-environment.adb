@@ -187,9 +187,11 @@ package body Minerva.Environment is
          pragma Unreferenced (Name);
          Op : constant Minerva.Entries.Subprograms.Class_Reference :=
                 Minerva.Entries.Subprograms.Create_Operator_Function
-                  (Declaration   => Package_Standard,
-                   Operator      => Operator,
-                   Call_Type     => Call_Type);
+                  (Declaration      => Package_Standard,
+                   Operator         => Operator,
+                   Environment_Name =>
+                     Minerva.Environment.Environment_Name (Environment),
+                   Call_Type        => Call_Type);
       begin
          Op.Set_Intrinsic;
          Insert (Environment, Op);
@@ -261,6 +263,26 @@ package body Minerva.Environment is
    begin
       return Minerva.Names.Cased_Text
         (Environment_Table (Environment).Name);
+   end Environment_Name;
+
+   ----------------------
+   -- Environment_Name --
+   ----------------------
+
+   function Environment_Name
+     (Environment : Minerva.Ids.Environment_Id)
+      return Minerva.Names.Minerva_Name
+   is
+      use Minerva.Ids;
+      Base_Name : constant Minerva.Names.Minerva_Name :=
+                    Environment_Table (Environment).Name;
+   begin
+      if Parent (Environment) = Minerva.Ids.Null_Environment_Id then
+         return Base_Name;
+      else
+         return Minerva.Names.Join
+           (Environment_Name (Parent (Environment)), Base_Name);
+      end if;
    end Environment_Name;
 
    ------------

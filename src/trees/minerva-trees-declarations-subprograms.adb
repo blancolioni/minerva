@@ -3,6 +3,7 @@ with Ada.Tags;
 
 with Minerva.Entries.Subprograms;
 with Minerva.Entries.Value.Formal_Arguments;
+with Minerva.Operators;
 with Minerva.Types.Void;
 with Minerva.Types.Callable;
 
@@ -227,6 +228,8 @@ package body Minerva.Trees.Declarations.Subprograms is
             end return;
          end Create_Formal_Arguments;
 
+         use all type Minerva.Operators.Minerva_Operator;
+
          Formal_Arguments : constant Formal_Argument_Array :=
                               Create_Formal_Arguments;
 
@@ -235,13 +238,29 @@ package body Minerva.Trees.Declarations.Subprograms is
                          (Definition       => This,
                           Return_Type      => Return_Type,
                           Formal_Arguments => Formal_Arguments);
+         Operator  : constant Minerva.Operators.Minerva_Operator :=
+                       Minerva.Operators.Get_Operator
+                         (This.Defining_Name);
+         Subpr     : constant Minerva.Entries.Subprograms.Class_Reference :=
+                       (if Operator = Op_None
+                        then Minerva.Entries.Subprograms.Create
+                          (Declaration      => This,
+                           Subprogram_Name  => This.Defining_Name,
+                           Environment_Name =>
+                             Minerva.Environment.Environment_Name
+                               (Environment),
+                           Call_Type        => Call_Type)
+                        else Minerva.Entries.Subprograms
+                        .Create_Operator_Function
+                          (Declaration      => This,
+                           Operator         => Operator,
+                           Environment_Name =>
+                             Minerva.Environment.Environment_Name
+                               (Environment),
+                           Call_Type        => Call_Type));
       begin
-         This.Set_Entry
-           (Minerva.Entries.Subprograms.Create
-              (Declaration     => This,
-               Subprogram_Name => This.Defining_Name,
-               Call_Type       => Call_Type));
-         Minerva.Environment.Insert (Environment, This.Get_Entry);
+         This.Set_Entry (Subpr);
+         Minerva.Environment.Insert (Environment, Subpr);
       end;
 
       if This.Has_Body then

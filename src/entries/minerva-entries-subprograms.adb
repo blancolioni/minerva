@@ -31,14 +31,18 @@ package body Minerva.Entries.Subprograms is
    function Create
      (Declaration      : not null access Minerva.Trees.Class;
       Subprogram_Name  : Minerva.Names.Minerva_Name;
+      Environment_Name : Minerva.Names.Minerva_Name;
       Call_Type        : not null Minerva.Types.Callable.Class_Reference)
       return Class_Reference
    is
    begin
       return Result : constant Class_Reference := new Instance do
          Result.Initialize_Subprogram
-           (Declaration, Subprogram_Name,
-            Call_Type);
+           (Declaration      => Declaration,
+            Environment_Name => Environment_Name,
+            Name             => Subprogram_Name,
+            Link_Name        => Subprogram_Name,
+            Call_Type        => Call_Type);
       end return;
    end Create;
 
@@ -47,32 +51,40 @@ package body Minerva.Entries.Subprograms is
    ------------------------------
 
    function Create_Operator_Function
-     (Declaration    : not null access Minerva.Trees.Class;
-      Operator       : Minerva.Operators.Minerva_Operator;
-      Call_Type      : not null Minerva.Types.Callable.Class_Reference)
+     (Declaration      : not null access Minerva.Trees.Class;
+      Operator         : Minerva.Operators.Minerva_Operator;
+      Environment_Name : Minerva.Names.Minerva_Name;
+      Call_Type        : not null Minerva.Types.Callable.Class_Reference)
       return Class_Reference
    is
    begin
       return Result : constant Class_Reference := new Instance do
          Result.Initialize_Subprogram
-           (Declaration, Minerva.Operators.Get_Name (Operator), Call_Type);
+           (Declaration      => Declaration,
+            Environment_Name => Environment_Name,
+            Name             => Minerva.Operators.Get_Name (Operator),
+            Link_Name        => Minerva.Names.To_Name (Operator'Image),
+            Call_Type        => Call_Type);
          Result.Operator := Operator;
       end return;
    end Create_Operator_Function;
 
-   ----------------
-   -- Initialize --
-   ----------------
+   ---------------------------
+   -- Initialize_Subprogram --
+   ---------------------------
 
    procedure Initialize_Subprogram
-     (This        : in out Class;
-      Declaration : not null access Minerva.Trees.Class;
-      Name        : Minerva.Names.Minerva_Name;
-      Call_Type   : not null Minerva.Types.Callable.Class_Reference)
+     (This             : in out Class;
+      Declaration      : not null access Minerva.Trees.Class;
+      Environment_Name : Minerva.Names.Minerva_Name;
+      Name             : Minerva.Names.Minerva_Name;
+      Link_Name        : Minerva.Names.Minerva_Name;
+      Call_Type        : not null Minerva.Types.Callable.Class_Reference)
    is
    begin
       This.Initialize_Entry
         (Declared_Name   => Name,
+         Link_Name       => Minerva.Names.Join (Environment_Name, Link_Name),
          Declaration     => Declaration,
          Entry_Type      => Call_Type,
          Is_Overloadable => True);
@@ -105,7 +117,7 @@ package body Minerva.Entries.Subprograms is
       if Dispatch (This).Is_Intrinsic then
          Push_Intrinsic (This, Unit);
       else
-         Unit.Call (This.Link_Name, Natural (This.Argument_List.Length));
+         Unit.Call (Link_Name (This), Natural (This.Argument_List.Length));
       end if;
    end Push;
 
