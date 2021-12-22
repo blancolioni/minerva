@@ -1,3 +1,5 @@
+with Ada.Strings.Fixed;
+
 package body Minerva.Entries.Value.Objects is
 
    ---------------------------------
@@ -83,91 +85,75 @@ package body Minerva.Entries.Value.Objects is
       end return;
    end Create_With_Static_Address;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+   overriding function To_Operand
+     (This : Instance)
+      return Tagatha.Operands.Operand_Type
    is
    begin
       if This.Has_Static_Address then
-         Unit.Pop_Address
-           (Address  => This.Static_Address'Image,
-            Data     => This.Data_Type,
-            Size     => This.Size);
+         return Tagatha.Operands.External_Operand
+           (Ada.Strings.Fixed.Trim
+              (This.Static_Address'Image, Ada.Strings.Left));
       elsif This.Has_Address then
-         if This.Variable_State.all then
-            Unit.Push_Local
-              (Offset => This.Local,
-               Data   => Tagatha.Address_Data,
-               Size   => Tagatha.Default_Address_Size);
-            Unit.Store (This.Size);
-         else
-            Unit.Pop_Local
-              (Offset => This.Local,
-               Data   => This.Data_Type,
-               Size   => Tagatha.Default_Address_Size);
-            This.Variable_State.all := True;
-         end if;
+         return Tagatha.Operands.Indirect
+           (Tagatha.Operands.Local_Operand
+              (This.Local));
       else
-         Unit.Pop_Local
-           (Offset => This.Local,
-            Data   => This.Data_Type,
-            Size   => This.Size);
+         return Tagatha.Operands.Local_Operand (This.Local);
       end if;
-   end Pop;
-
-   ----------
-   -- Push --
-   ----------
-
-   overriding procedure Push
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      if This.Has_Static_Address then
-         Unit.Push_Label
-           (Label_Name => This.Static_Address'Image,
-            Data       => This.Data_Type,
-            Size       => This.Size);
-      elsif This.Has_Address then
-         Unit.Push_Local
-           (Offset => This.Local,
-            Data   => Tagatha.Address_Data);
-         Unit.Dereference
-           (Data => This.Data_Type,
-            Size => This.Size);
-      else
-         Unit.Push_Local
-           (Offset => This.Local,
-            Data   => This.Data_Type,
-            Size   => This.Size);
-      end if;
-   end Push;
+   end To_Operand;
 
    ------------------
    -- Push_Address --
    ------------------
 
-   overriding procedure Push_Address
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      if This.Has_Static_Address then
-         Unit.Push
-           (Value => Tagatha.Tagatha_Integer (This.Static_Address),
-            Size  => Tagatha.Default_Address_Size);
-      elsif This.Has_Address then
-         Unit.Push_Local
-           (Offset => This.Local,
-            Data   => Tagatha.Address_Data);
-      else
-         Unit.Push_Local_Address
-           (Offset => This.Local);
-      end if;
-   end Push_Address;
+   --  overriding procedure Push_Address
+   --    (This : Instance; Unit : in out Tagatha.Code.Instance)
+   --  is
+   --  begin
+   --     if This.Has_Static_Address then
+   --        Unit.Push
+   --          (Value => Tagatha.Tagatha_Integer (This.Static_Address),
+   --           Size  => Tagatha.Default_Address_Size);
+   --     elsif This.Has_Address then
+   --        if This.Variable_State.all then
+   --           Unit.Push_Local
+   --             (Offset => This.Local,
+   --              Data   => Tagatha.Address_Data);
+   --        else
+   --           Unit.Push_Local_Address
+   --             (Offset => This.Local);
+   --           This.Variable_State.all := True;
+   --        end if;
+   --     else
+   --        Unit.Push_Local_Address
+   --          (Offset => This.Local);
+   --     end if;
+   --  end Push_Address;
+
+   -----------
+   -- Store --
+   -----------
+
+   --  overriding procedure Store
+   --    (This  : Instance;
+   --     Value : not null access constant
+   --       Minerva.Trees.Expressions.Instance'Class;
+   --     Unit  : in out Tagatha.Code.Instance)
+   --  is
+   --  begin
+   --     if This.Has_Address
+   --       and then not This.Has_Static_Address
+   --       and then not This.Variable_State.all
+   --     then
+   --        Unit.Push_Local_Address
+   --          (Offset => This.Local);
+   --        Value.Push (Unit);
+   --        Unit.Store (Tagatha.Address_Data, Tagatha.Default_Address_Size);
+   --        This.Variable_State.all := True;
+   --     else
+   --        Parent (This).Store (Value, Unit);
+   --     end if;
+   --  end Store;
 
 end Minerva.Entries.Value.Objects;

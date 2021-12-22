@@ -131,26 +131,13 @@ package body Minerva.Trees.Expressions.Dots is
       return False;
    end Is_Static;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      This.Left.Push_Address (Unit);
-      This.Get_Entry.Pop (Unit);
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       This.Left.Push_Address (Unit);
@@ -163,7 +150,7 @@ package body Minerva.Trees.Expressions.Dots is
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       This.Left.Push_Address (Unit);

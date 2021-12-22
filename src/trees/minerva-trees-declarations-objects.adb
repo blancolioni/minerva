@@ -47,7 +47,7 @@ package body Minerva.Trees.Declarations.Objects is
 
    overriding procedure Compile_Tree
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
 
       procedure Compile_Object
@@ -80,14 +80,16 @@ package body Minerva.Trees.Declarations.Objects is
                                       then Address_Aspect.Value
                                       else null);
                begin
-                  Address.Push (Unit);
-                  Object_Entry.Pop (Unit);
+                  Object_Entry.Store
+                    (Value => Address,
+                     Unit  => Unit);
                end;
             end if;
 
          elsif This.Has_Initializer then
-            This.Initializer.Push (Unit);
-            Object_Entry.Pop (Unit);
+            Object_Entry.Store
+              (Value => This.Initializer,
+               Unit  => Unit);
          end if;
 
       end Compile_Object;

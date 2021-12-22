@@ -1,3 +1,5 @@
+with Tagatha.Operands;
+
 with Minerva.Primitives;
 
 package body Minerva.Values is
@@ -160,7 +162,7 @@ package body Minerva.Values is
    ----------
 
    procedure Push (Value : Minerva_Value;
-                   Unit  : in out Tagatha.Units.Tagatha_Unit)
+                   Unit  : in out Tagatha.Code.Instance)
    is
    begin
       case Value.Class is
@@ -168,11 +170,16 @@ package body Minerva.Values is
             raise Constraint_Error with
               "cannot push no value";
          when Signed_Integer_Class | Unsigned_Integer_Class =>
-            Unit.Push (Tagatha.Tagatha_Integer (Value.Integral_Value),
-                       Tagatha.Bits_To_Size
-                         (Value.Value_Type.Size_Bits));
+            Unit.Push
+              (Operand =>
+                  Tagatha.Operands.Set_Size
+                 (Value.Value_Type.Size,
+                  Tagatha.Operands.Constant_Operand
+                    (Tagatha.Tagatha_Integer (Value.Integral_Value))));
          when Floating_Point_Class =>
-            Unit.Push (Tagatha.Tagatha_Floating_Point (Value.Float_Value));
+            Unit.Push
+              (Tagatha.Operands.Constant_Operand
+                 (Tagatha.Tagatha_Floating_Point (Value.Float_Value)));
       end case;
    end Push;
 

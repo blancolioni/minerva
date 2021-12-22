@@ -3,7 +3,8 @@ with Ada.Text_IO;
 
 with GCS.Errors;
 
-with Tagatha.Units.Listing;
+with Tagatha.Arch;
+with Tagatha.Code;
 
 with Pdp11.Assembler;
 
@@ -34,8 +35,10 @@ package body Minerva.Build is
                    Ada.Directories.Base_Name (Source_File);
       Output_Path : constant String :=
                       Name & ".o";
-      Unit     : Tagatha.Units.Tagatha_Unit;
+      Unit     : Tagatha.Code.Instance;
       Assembly : Pdp11.Assembler.Assembly_Type;
+      Arch        : Tagatha.Arch.Any_Instance :=
+                      Tagatha.Arch.Get ("pdp-11");
 
       procedure Compile_Unit
         (Compilation_Unit : Minerva.Trees.Declarations.Class_Reference);
@@ -55,24 +58,16 @@ package body Minerva.Build is
       end Compile_Unit;
 
    begin
-      Unit.Create_Unit
-        (Name        => Name,
-         Source_File => Source_File);
-
       Minerva.Logging.Log ("main: " & Main.Image);
       Main.Compile (Unit);
       Minerva.Library.Iterate_Bodies (Compile_Unit'Access);
 
-      Unit.Finish_Unit;
-
       if Minerva.Options.Write_Listing then
-         Tagatha.Units.Listing.Write_Command_Listing (Unit);
-         Tagatha.Units.Listing.Write_Transfer_Listing (Unit);
+         Unit.Write_Listing (Name & ".lst");
       end if;
 
-      Unit.Write
-        (Target_Name    => "pdp-11",
-         Directory_Path => ".");
+      Unit.Generate (Arch);
+      Arch.Save (Name & ".s");
 
       Assembly.Load (Name & ".s");
       Assembly.Link;

@@ -277,7 +277,9 @@ package body Minerva.Environment is
       Base_Name : constant Minerva.Names.Minerva_Name :=
                     Environment_Table (Environment).Name;
    begin
-      if Parent (Environment) = Minerva.Ids.Null_Environment_Id then
+      if Environment = 1 then
+         return Minerva.Names.Null_Minerva_Name;
+      elsif Parent (Environment) = Minerva.Ids.Null_Environment_Id then
          return Base_Name;
       else
          return Minerva.Names.Join

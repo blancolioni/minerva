@@ -1,3 +1,5 @@
+with Tagatha.Operands;
+
 with Minerva.Names;
 
 package body Minerva.Entries.Subprograms is
@@ -9,7 +11,7 @@ package body Minerva.Entries.Subprograms is
 
    procedure Push_Intrinsic
      (This : Class;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    -------------------------
    -- Add_Formal_Argument --
@@ -93,31 +95,42 @@ package body Minerva.Entries.Subprograms is
       end loop;
    end Initialize_Subprogram;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      raise Constraint_Error with
-        "cannot pop subprogram: " & This.Cased_Text;
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       if Dispatch (This).Is_Intrinsic then
          Push_Intrinsic (This, Unit);
       else
-         Unit.Call (Link_Name (This), Natural (This.Argument_List.Length));
+         declare
+            Call_Type  : Minerva.Types.Callable.Class renames
+                           Minerva.Types.Callable.Class (This.Entry_Type.all);
+            Has_Result : constant Boolean := Call_Type.Has_Return_Type;
+            Result_Type : constant Minerva.Types.Class_Reference :=
+                            (if Has_Result
+                             then Call_Type.Return_Type
+                             else null);
+            Result_Size : constant Natural :=
+                            (if Has_Result
+                             then Result_Type.Size_Words
+                             else 0);
+            Arg_Count   : constant Natural :=
+                            Natural (This.Argument_List.Length);
+         begin
+            if Result_Size = 1 then
+               Unit.Push (Tagatha.Operands.Constant_Operand (0));
+            end if;
+            Unit.Push
+              (Tagatha.Operands.External_Operand (Link_Name (This)));
+            Unit.Call (Arg_Count);
+            --  Unit.Skip_Next_Store;
+         end;
+
       end if;
    end Push;
 
@@ -126,7 +139,7 @@ package body Minerva.Entries.Subprograms is
    ------------------
 
    overriding procedure Push_Address
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       raise Constraint_Error with
@@ -139,7 +152,7 @@ package body Minerva.Entries.Subprograms is
 
    procedure Push_Intrinsic
      (This : Class;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
       use all type Minerva.Operators.Minerva_Operator;
    begin
@@ -149,28 +162,28 @@ package body Minerva.Entries.Subprograms is
             This.Cased_Text & ": unlikely to be intrinsic";
          when Op_Add =>
             Unit.Operate
-              (Op => Tagatha.Op_Add);
+              (Operator => Tagatha.Op_Add);
          when Op_Subtract =>
             Unit.Operate
-              (Op => Tagatha.Op_Sub);
+              (Operator => Tagatha.Op_Sub);
          when Op_EQ =>
             Unit.Operate
-              (Op => Tagatha.Op_Equal);
+              (Operator => Tagatha.Op_Equal);
          when Op_NE =>
             Unit.Operate
-              (Op => Tagatha.Op_Not_Equal);
+              (Operator => Tagatha.Op_Not_Equal);
          when Op_GT =>
             Unit.Operate
-              (Op => Tagatha.Op_Greater);
+              (Operator => Tagatha.Op_Greater);
          when Op_LT =>
             Unit.Operate
-              (Op => Tagatha.Op_Less);
+              (Operator => Tagatha.Op_Less);
          when Op_GE =>
             Unit.Operate
-              (Op => Tagatha.Op_Greater_Equal);
+              (Operator => Tagatha.Op_Greater_Equal);
          when Op_LE =>
             Unit.Operate
-              (Op => Tagatha.Op_Less_Equal);
+              (Operator => Tagatha.Op_Less_Equal);
          when others =>
             raise Constraint_Error with
             This.Cased_Text & ": unimplemented intrinsic";

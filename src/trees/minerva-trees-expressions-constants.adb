@@ -1,5 +1,4 @@
-with Tagatha.Constants;
-with Tagatha.Transfers;
+with Tagatha.Operands;
 
 with Minerva.Names;
 with Minerva.Types;
@@ -127,79 +126,43 @@ package body Minerva.Trees.Expressions.Constants is
       return True;
    end Is_Static;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      raise Constraint_Error with
-        "cannot pop constant " & Image (Dispatch (This));
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
-      procedure Push (Const : Tagatha.Constants.Tagatha_Constant);
 
-      procedure Push_Integer (Value : Tagatha.Tagatha_Integer);
-      procedure Push_Float (Value : Tagatha.Tagatha_Floating_Point);
+      procedure Push (Operand : Tagatha.Operands.Operand_Type);
 
       ----------
       -- Push --
       ----------
 
-      procedure Push (Const : Tagatha.Constants.Tagatha_Constant)
-      is
+      procedure Push (Operand : Tagatha.Operands.Operand_Type) is
       begin
-         Unit.Push_Operand
-           (Op   =>
-              Tagatha.Transfers.Constant_Operand
-                (Const,
-                 Size =>
-                   Tagatha.Bits_To_Size (This.Get_Type.Size_Bits)));
+         Unit.Push
+           (Tagatha.Operands.Set_Size
+              (This.Get_Type.Size,
+               Operand));
       end Push;
-
-      ----------------
-      -- Push_Float --
-      ----------------
-
-      procedure Push_Float (Value : Tagatha.Tagatha_Floating_Point) is
-         Op : constant Tagatha.Constants.Tagatha_Constant :=
-                Tagatha.Constants.Floating_Point_Constant (Value);
-      begin
-         Push (Op);
-      end Push_Float;
-
-      ------------------
-      -- Push_Integer --
-      ------------------
-
-      procedure Push_Integer (Value : Tagatha.Tagatha_Integer) is
-         Op : constant Tagatha.Constants.Tagatha_Constant :=
-                Tagatha.Constants.Integer_Constant (Value);
-      begin
-         Push (Op);
-      end Push_Integer;
 
    begin
       case This.Const_Type is
          when Universal_Integer_Constant =>
-            Push_Integer
-              (Tagatha.Tagatha_Integer'Value
-                 (Minerva.Names.Standard_Text (This.Image)));
+            Push
+              (Tagatha.Operands.Constant_Operand
+                 (Tagatha.Tagatha_Integer'Value
+                      (Minerva.Names.Standard_Text (This.Image))));
          when Universal_Float_Constant =>
-            Push_Float
-              (Tagatha.Tagatha_Floating_Point'Value
-                 (Minerva.Names.Standard_Text (This.Image)));
+            Push
+              (Tagatha.Operands.Set_Data_Type
+                 (Tagatha.Floating_Point_Data,
+                  Tagatha.Operands.Constant_Operand
+                    (Tagatha.Tagatha_Floating_Point'Value
+                         (Minerva.Names.Standard_Text (This.Image)))));
          when Universal_String_Constant =>
             null;
       end case;
@@ -211,7 +174,7 @@ package body Minerva.Trees.Expressions.Constants is
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       raise Constraint_Error with

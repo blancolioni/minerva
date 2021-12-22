@@ -81,25 +81,13 @@ package body Minerva.Trees.Expressions.Identifiers is
       return This.Get_Entry.Is_Static;
    end Is_Static;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      This.Get_Entry.Pop (Unit);
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       This.Get_Entry.Push (Unit);
@@ -111,7 +99,7 @@ package body Minerva.Trees.Expressions.Identifiers is
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       This.Get_Entry.Push_Address (Unit);

@@ -25,30 +25,16 @@ package body Minerva.Entries.Value.Components is
       return new Instance'(This);
    end Create;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      This.Push_Address (Unit);
-      Unit.Store;
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
-      This.Push_Address (Unit);
-      Unit.Dereference;
+      Dispatch (This).Push_Address (Unit);
    end Push;
 
    ------------------
@@ -57,7 +43,7 @@ package body Minerva.Entries.Value.Components is
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
       use Minerva.Target;
       Offset : constant Natural :=
@@ -65,7 +51,8 @@ package body Minerva.Entries.Value.Components is
                    * Natural (Target_Word_Size / 8);
    begin
       Unit.Push
-        (Tagatha.Tagatha_Integer (Offset));
+        (Tagatha.Operands.Constant_Operand
+           (Tagatha.Tagatha_Integer (Offset)));
       Unit.Operate (Tagatha.Op_Add);
    end Push_Address;
 

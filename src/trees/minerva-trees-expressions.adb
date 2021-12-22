@@ -54,7 +54,7 @@ package body Minerva.Trees.Expressions is
    -------------
 
    overriding procedure Compile_Tree
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       Dispatch (This).Push (Unit);

@@ -35,16 +35,12 @@ private
          Environment : Minerva.Ids.Environment_Id;
       end record;
 
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
 end Minerva.Entries.Withs;

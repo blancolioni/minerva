@@ -1,6 +1,6 @@
 with GCS.Positions;
 
-with Tagatha.Units;
+with Tagatha.Code;
 
 with Minerva.Environment;
 with Minerva.Ids;
@@ -45,7 +45,7 @@ private package Minerva.Trees is
 
    procedure Compile
      (This : Class;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
      with Pre => This.Elaborated and then This.Checked;
 
    procedure Elaborate_Tree
@@ -58,7 +58,7 @@ private package Minerva.Trees is
 
    procedure Compile_Tree
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is abstract;
 
    function Has_Environment

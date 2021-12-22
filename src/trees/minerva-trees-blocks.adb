@@ -70,21 +70,21 @@ package body Minerva.Trees.Blocks is
    -------------
 
    overriding procedure Compile_Tree
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
       Frame_Words : constant Natural :=
                       Minerva.Environment.Current_Frame_Offset
                         (This.Environment)
                         - This.Frame_Offset;
    begin
-      Unit.Begin_Frame (Frame_Words);
+      Unit.Reserve (Frame_Words);
       for Declaration of This.Declarations loop
          Declaration.Compile (Unit);
       end loop;
       for Statement of This.Statements loop
          Statement.Compile (Unit);
       end loop;
-      Unit.End_Frame;
+      Unit.Drop (Frame_Words);
    end Compile_Tree;
 
    ------------------

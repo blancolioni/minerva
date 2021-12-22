@@ -1,3 +1,5 @@
+with Tagatha.Operands;
+
 with Minerva.Trees.Expressions;
 with Minerva.Types;
 
@@ -14,6 +16,11 @@ package Minerva.Entries.Value is
 
    type Constant_Reference is access all Instance;
    type Constant_Class_Reference is access all Class;
+
+   function To_Operand
+     (This : Instance)
+      return Tagatha.Operands.Operand_Type
+      is abstract;
 
 private
 
@@ -33,13 +40,19 @@ private
       Has_Address        : Boolean := False;
       Has_Static_Address : Boolean := False);
 
-   overriding procedure Pop
+   overriding procedure Store
+     (This  : Instance;
+      Value : not null access constant
+        Minerva.Trees.Expressions.Instance'Class;
+      Unit  : in out Tagatha.Code.Instance);
+
+   overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    function Data_Type
      (This : Class)

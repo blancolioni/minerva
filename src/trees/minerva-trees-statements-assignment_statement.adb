@@ -30,11 +30,12 @@ package body Minerva.Trees.Statements.Assignment_Statement is
    -------------
 
    overriding procedure Compile_Tree
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
+      This.Target.Push_Address (Unit);
       This.Value.Push (Unit);
-      This.Target.Pop (Unit);
+      Unit.Store;
    end Compile_Tree;
 
    ------------

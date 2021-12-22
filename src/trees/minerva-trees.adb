@@ -59,7 +59,7 @@ package body Minerva.Trees is
 
    procedure Compile
      (This : Class;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       if Minerva.Options.Trace_Stages then

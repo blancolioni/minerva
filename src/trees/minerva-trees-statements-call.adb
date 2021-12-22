@@ -30,7 +30,7 @@ package body Minerva.Trees.Statements.Call is
    -------------
 
    overriding procedure Compile_Tree
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       This.Call.Push (Unit);

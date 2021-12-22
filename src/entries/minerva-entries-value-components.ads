@@ -34,16 +34,18 @@ private
          Bit_Offset       : Natural;
       end record;
 
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+   overriding function To_Operand
+     (This : Instance)
+      return Tagatha.Operands.Operand_Type
+   is (Tagatha.Operands.Constant_Operand
+       (Tagatha.Tagatha_Integer (This.Word_Offset)));
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
 end Minerva.Entries.Value.Components;

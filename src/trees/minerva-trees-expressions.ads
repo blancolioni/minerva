@@ -25,21 +25,16 @@ package Minerva.Trees.Expressions is
 
    overriding procedure Compile_Tree
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is abstract;
 
    procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is abstract;
-
-   procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is abstract;
 
    function Is_Static

@@ -46,23 +46,11 @@ private
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   --  overriding function Get_Possible_Types
-   --    (This : Instance)
-   --     return Minerva.Types.Lists.List;
-
-   --  overriding function Children
-   --    (This : Instance)
-   --     return Minerva.Inference.Typeable_Reference_Array;
+      Unit : in out Tagatha.Code.Instance);
 
    overriding procedure Set_Type
      (This          : in out Instance;

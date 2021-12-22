@@ -29,7 +29,7 @@ package Minerva.Trees.Blocks is
 
    overriding procedure Compile_Tree
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+      Unit : in out Tagatha.Code.Instance);
 
    overriding function Children
      (This    : Instance)

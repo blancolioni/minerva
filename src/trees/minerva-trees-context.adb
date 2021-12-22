@@ -35,7 +35,7 @@ package body Minerva.Trees.Context is
    ------------------
 
    overriding procedure Compile_Tree
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       This.Library_Spec.Compile (Unit);

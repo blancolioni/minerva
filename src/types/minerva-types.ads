@@ -2,6 +2,7 @@ private with Minerva.Ids;
 private with Minerva.Names;
 private with Minerva.Target;
 
+with Tagatha;
 with Minerva.Trees;
 
 private package Minerva.Types is
@@ -30,6 +31,14 @@ private package Minerva.Types is
    function Definition
      (This : Class)
       return Minerva.Trees.Class_Reference;
+
+   function Data_Type
+     (This : Class)
+      return Tagatha.Tagatha_Data_Type;
+
+   function Size
+     (This : Class)
+      return Tagatha.Tagatha_Size;
 
    function Size_Words
      (This : Class)

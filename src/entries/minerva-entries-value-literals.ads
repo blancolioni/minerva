@@ -33,16 +33,8 @@ private
          Value : Natural;
       end record;
 
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   overriding procedure Push
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   overriding procedure Push_Address
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+   overriding function To_Operand
+     (This : Instance)
+      return Tagatha.Operands.Operand_Type;
 
 end Minerva.Entries.Value.Literals;

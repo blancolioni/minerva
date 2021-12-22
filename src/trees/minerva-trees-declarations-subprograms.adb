@@ -55,7 +55,7 @@ package body Minerva.Trees.Declarations.Subprograms is
 
    overriding procedure Compile_Tree
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       if This.Has_Body then

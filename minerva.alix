@@ -12,7 +12,7 @@ source_dir = src/values
 main_unit = minerva-driver
 exec_name = minerva
 config_dir = config
-depend = { project = tagatha version = any }
+depend = { project = tagatha2 version = any }
 depend = { project = gcs version = any }
 depend = { project = wlib version = any }
 depend = { project = pdp11 version = any }

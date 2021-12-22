@@ -1,4 +1,4 @@
-with Tagatha.Units;
+with Tagatha.Code;
 
 with Minerva.Names;
 
@@ -28,20 +28,27 @@ private package Minerva.Entries is
      (This : Instance)
       return Minerva.Values.Minerva_Value;
 
-   procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is abstract;
+   --  procedure Pop
+   --    (This : Instance;
+   --     Unit : in out Tagatha.Code.Instance)
+   --  is abstract;
 
    procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is abstract;
 
    procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is abstract;
+
+   procedure Store
+     (This  : Instance;
+      Value : not null access constant
+        Minerva.Trees.Expressions.Instance'Class;
+      Unit  : in out Tagatha.Code.Instance)
+   is null;
 
    function Link_Name
      (This : Class)

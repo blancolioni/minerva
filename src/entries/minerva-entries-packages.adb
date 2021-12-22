@@ -18,23 +18,12 @@ package body Minerva.Entries.Packages is
       end return;
    end Create;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      raise Constraint_Error with "cannot pop a package";
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       raise Constraint_Error with "cannot push a package";
@@ -45,7 +34,7 @@ package body Minerva.Entries.Packages is
    ------------------
 
    overriding procedure Push_Address
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       raise Constraint_Error with "cannot push a package address";

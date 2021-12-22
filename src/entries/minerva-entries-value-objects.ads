@@ -58,21 +58,27 @@ private
       return Boolean
    is (True);
 
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+   --  overriding procedure Push
+   --    (This : Instance;
+   --     Unit : in out Tagatha.Code.Instance);
+   --
+   --  overriding procedure Push_Address
+   --    (This : Instance;
+   --     Unit : in out Tagatha.Code.Instance);
 
-   overriding procedure Push
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   overriding procedure Push_Address
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+   --  overriding procedure Store
+   --    (This  : Instance;
+   --     Value : not null access constant
+   --       Minerva.Trees.Expressions.Instance'Class;
+   --     Unit  : in out Tagatha.Code.Instance);
 
    overriding function Static_Address
      (This : Instance)
       return Minerva.Target.Target_Address_Type
    is (This.Static_Address);
+
+   overriding function To_Operand
+     (This : Instance)
+      return Tagatha.Operands.Operand_Type;
 
 end Minerva.Entries.Value.Objects;

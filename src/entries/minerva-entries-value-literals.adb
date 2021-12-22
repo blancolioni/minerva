@@ -1,3 +1,5 @@
+with Tagatha.Operands;
+
 package body Minerva.Entries.Value.Literals is
 
    ------------
@@ -26,40 +28,17 @@ package body Minerva.Entries.Value.Literals is
       end return;
    end Create;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      raise Constraint_Error with
-        "cannot pop an enumeration literal";
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
-   overriding procedure Push
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+   overriding function To_Operand
+     (This : Instance)
+      return Tagatha.Operands.Operand_Type
    is
    begin
-      Unit.Push (Value => Tagatha.Tagatha_Integer (This.Value));
-   end Push;
-
-   ------------------
-   -- Push_Address --
-   ------------------
-
-   overriding procedure Push_Address
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      raise Constraint_Error with
-        "cannot push the address of an enumeration literal";
-   end Push_Address;
+      return Tagatha.Operands.Constant_Operand
+        (Tagatha.Tagatha_Integer (This.Value));
+   end To_Operand;
 
 end Minerva.Entries.Value.Literals;

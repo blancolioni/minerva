@@ -1,3 +1,5 @@
+with Tagatha.Labels;
+
 with Minerva.Primitives;
 
 package body Minerva.Trees.Statements.If_Statement is
@@ -99,26 +101,28 @@ package body Minerva.Trees.Statements.If_Statement is
    ------------------
 
    overriding procedure Compile_Tree
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
       use type Minerva.Trees.Expressions.Class_Reference;
-      Next_Label : Natural := 0;
-      Out_Label  : constant Positive := Unit.Next_Label;
+      Have_Next_Label : Boolean := False;
+      Next_Label : Tagatha.Labels.Label;
+      Out_Label  : constant Tagatha.Labels.Label := Unit.Next_Label;
    begin
       for Element of This.Elements loop
-         if Next_Label > 0 then
+         if Have_Next_Label then
             Unit.Label (Next_Label);
-            Next_Label := 0;
+            Have_Next_Label := False;
          end if;
          if Element.Condition /= null then
             Next_Label := Unit.Next_Label;
+            Have_Next_Label := True;
             Element.Condition.Push (Unit);
-            Unit.Jump (Next_Label, Tagatha.C_Equal);
+            Unit.Branch (Tagatha.C_Equal, Next_Label);
          end if;
          Element.Sequence.Compile (Unit);
-         Unit.Jump (Out_Label, Tagatha.C_Always);
+         Unit.Branch (Tagatha.C_Always, Out_Label);
       end loop;
-      if Next_Label /= 0 then
+      if Have_Next_Label then
          Unit.Label (Next_Label);
       end if;
       Unit.Label (Out_Label);

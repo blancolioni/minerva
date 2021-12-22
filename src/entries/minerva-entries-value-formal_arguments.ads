@@ -41,16 +41,9 @@ private
       return Boolean
    is (True);
 
-   overriding procedure Pop
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   overriding procedure Push
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
-
-   overriding procedure Push_Address
-     (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit);
+   overriding function To_Operand
+     (This : Instance)
+      return Tagatha.Operands.Operand_Type
+   is (Tagatha.Operands.Argument_Operand (This.Frame_Offset));
 
 end Minerva.Entries.Value.Formal_Arguments;

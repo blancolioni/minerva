@@ -1,3 +1,5 @@
+with Tagatha.Labels;
+
 with Minerva.Environment;
 with Minerva.Primitives;
 
@@ -50,10 +52,10 @@ package body Minerva.Trees.Statements.Loop_Statement is
    ------------------
 
    overriding procedure Compile_Tree
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
-      Loop_Label : constant Positive := Unit.Next_Label;
-      Out_Label  : constant Positive := Unit.Next_Label;
+      Loop_Label : constant Tagatha.Labels.Label := Unit.Next_Label;
+      Out_Label  : constant Tagatha.Labels.Label := Unit.Next_Label;
    begin
       Unit.Label (Loop_Label);
 
@@ -66,10 +68,10 @@ package body Minerva.Trees.Statements.Loop_Statement is
             null;
          when While_Loop =>
             This.Condition.Push (Unit);
-            Unit.Jump (Out_Label, Tagatha.C_Equal);
+            Unit.Branch (Tagatha.C_Equal, Out_Label);
       end case;
       This.Loop_Body.Compile (Unit);
-      Unit.Jump (Loop_Label, Tagatha.C_Always);
+      Unit.Branch (Tagatha.C_Always, Loop_Label);
       Unit.Label (Out_Label);
    end Compile_Tree;
 

@@ -24,24 +24,12 @@ package body Minerva.Entries.Types is
       end return;
    end Create;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      raise Constraint_Error with
-        "cannot pop a type entry: " & This.Cased_Text;
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       raise Constraint_Error with
@@ -53,7 +41,7 @@ package body Minerva.Entries.Types is
    ------------------
 
    overriding procedure Push_Address
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
    is
    begin
       raise Constraint_Error with

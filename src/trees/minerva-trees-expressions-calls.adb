@@ -195,24 +195,13 @@ package body Minerva.Trees.Expressions.Calls is
                     Actual.Is_Static (Environment));
    end Is_Static;
 
-   ---------
-   -- Pop --
-   ---------
-
-   overriding procedure Pop
-     (This : Instance; Unit : in out Tagatha.Units.Tagatha_Unit)
-   is
-   begin
-      raise Constraint_Error with "cannot pop a call";
-   end Pop;
-
    ----------
    -- Push --
    ----------
 
    overriding procedure Push
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       for Arg of This.Actuals loop
@@ -227,7 +216,7 @@ package body Minerva.Trees.Expressions.Calls is
 
    overriding procedure Push_Address
      (This : Instance;
-      Unit : in out Tagatha.Units.Tagatha_Unit)
+      Unit : in out Tagatha.Code.Instance)
    is
    begin
       raise Constraint_Error with

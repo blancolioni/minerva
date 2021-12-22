@@ -1,4 +1,4 @@
-with Tagatha.Units;
+with Tagatha.Code;
 
 with Minerva.Operators;
 with Minerva.Target;
@@ -34,7 +34,7 @@ private package Minerva.Values is
 
    procedure Push
      (Value : Minerva_Value;
-      Unit  : in out Tagatha.Units.Tagatha_Unit);
+      Unit  : in out Tagatha.Code.Instance);
 
 private
 
