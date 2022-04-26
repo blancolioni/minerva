@@ -53,7 +53,11 @@ package body Minerva.Entries.Value.Components is
       Unit.Push
         (Tagatha.Operands.Constant_Operand
            (Tagatha.Tagatha_Integer (Offset)));
-      Unit.Operate (Tagatha.Op_Add);
+      Unit.Operate
+        (Tagatha.Op_Add,
+         Tagatha.Operands.Take_Address
+           (Tagatha.Operands.Type_Annotation
+                (This.Data_Type, This.Size)));
    end Push_Address;
 
 end Minerva.Entries.Value.Components;

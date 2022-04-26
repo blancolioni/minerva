@@ -13,6 +13,7 @@ with Minerva.Library;
 with Minerva.Logging;
 with Minerva.Options;
 with Minerva.Parser;
+with Minerva.Paths;
 with Minerva.Primitives;
 
 with Minerva.Trees.Declarations;
@@ -37,8 +38,6 @@ package body Minerva.Build is
                       Name & ".o";
       Unit     : Tagatha.Code.Instance;
       Assembly : Pdp11.Assembler.Assembly_Type;
-      Arch        : Tagatha.Arch.Any_Instance :=
-                      Tagatha.Arch.Get ("pdp-11");
 
       procedure Compile_Unit
         (Compilation_Unit : Minerva.Trees.Declarations.Class_Reference);
@@ -66,12 +65,22 @@ package body Minerva.Build is
          Unit.Write_Listing (Name & ".lst");
       end if;
 
-      Unit.Generate (Arch);
-      Arch.Save (Name & ".s");
+      declare
+         Arch : Tagatha.Arch.Any_Instance :=
+                  Tagatha.Arch.Get
+                    (Minerva.Options.Target);
+      begin
+         Unit.Generate (Arch);
+         Arch.Save (Name & ".s");
+      end;
 
-      Assembly.Load (Name & ".s");
-      Assembly.Link;
-      Assembly.Save (Output_Path);
+      if not Minerva.Options.Compile_Only then
+         Assembly.Load (Name & ".s");
+         Assembly.Load (Minerva.Paths.Config_File ("arch/pdp-11/athena.s"));
+         Assembly.Link;
+         Assembly.Save (Output_Path);
+      end if;
+
    end Compile_All;
 
    ---------------

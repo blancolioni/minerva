@@ -1,6 +1,8 @@
 package Minerva.Options is
 
 	Execute           : Boolean := False;
+	Compile_Only      : Boolean := False;
+	Target            : String  := "pdp-11";
 	Trace_Environment : Boolean := False;
 	Trace_Stages      : Boolean := False;
 	Write_Listing     : Boolean := False;

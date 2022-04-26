@@ -108,6 +108,7 @@ package body Minerva.Entries.Subprograms is
          Push_Intrinsic (This, Unit);
       else
          declare
+            use Tagatha.Operands;
             Call_Type  : Minerva.Types.Callable.Class renames
                            Minerva.Types.Callable.Class (This.Entry_Type.all);
             Has_Result : constant Boolean := Call_Type.Has_Return_Type;
@@ -119,15 +120,23 @@ package body Minerva.Entries.Subprograms is
                             (if Has_Result
                              then Result_Type.Size_Words
                              else 0);
+            Result_Operand : constant Operand_Type :=
+                               (if Has_Result
+                                then Set_Data_Type
+                                  (Result_Type.Data_Type,
+                                   Set_Size
+                                     (Result_Type.Size,
+                                      Stack_Operand))
+                                else No_Operand);
             Arg_Count   : constant Natural :=
                             Natural (This.Argument_List.Length);
          begin
-            if Result_Size = 1 then
-               Unit.Push (Tagatha.Operands.Constant_Operand (0));
-            end if;
+            Unit.Reserve (Result_Size);
             Unit.Push
               (Tagatha.Operands.External_Operand (Link_Name (This)));
-            Unit.Call (Arg_Count);
+            Unit.Call
+              (Result         => Result_Operand,
+               Argument_Count => Arg_Count);
             --  Unit.Skip_Next_Store;
          end;
 

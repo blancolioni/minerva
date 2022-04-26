@@ -2,6 +2,8 @@
 package Minerva.Options is
 
    function Execute return Boolean;
+   function Compile_Only return Boolean;
+   function Target return String;
    function Trace_Environment return Boolean;
    function Trace_Stages return Boolean;
    function Write_Listing return Boolean;

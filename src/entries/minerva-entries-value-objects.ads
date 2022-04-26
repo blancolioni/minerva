@@ -81,4 +81,7 @@ private
      (This : Instance)
       return Tagatha.Operands.Operand_Type;
 
+   overriding procedure Push_Address
+     (This : Instance; Unit : in out Tagatha.Code.Instance);
+
 end Minerva.Entries.Value.Objects;

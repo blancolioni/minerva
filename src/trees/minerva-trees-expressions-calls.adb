@@ -6,7 +6,9 @@ package body Minerva.Trees.Expressions.Calls is
    -- Children --
    --------------
 
-   overriding function Children (This : Instance) return Class_Reference_Array
+   overriding function Children
+     (This : Instance)
+      return Class_Reference_Array
    is
    begin
       return Result : Class_Reference_Array (1 .. This.Actuals.Last_Index + 1)

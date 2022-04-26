@@ -85,6 +85,25 @@ package body Minerva.Entries.Value.Objects is
       end return;
    end Create_With_Static_Address;
 
+   overriding procedure Push_Address
+     (This : Instance; Unit : in out Tagatha.Code.Instance)
+   is
+      use Tagatha.Operands;
+   begin
+      if This.Has_Address and then not This.Has_Static_Address
+        and then not This.Variable_State.all
+      then
+         Unit.Push
+           (Take_Address (Dispatch (This).To_Operand));
+      else
+         Parent (This).Push_Address (Unit);
+      end if;
+   end Push_Address;
+
+   ----------------
+   -- To_Operand --
+   ----------------
+
    overriding function To_Operand
      (This : Instance)
       return Tagatha.Operands.Operand_Type
@@ -93,11 +112,17 @@ package body Minerva.Entries.Value.Objects is
       if This.Has_Static_Address then
          return Tagatha.Operands.External_Operand
            (Ada.Strings.Fixed.Trim
-              (This.Static_Address'Image, Ada.Strings.Left));
+              (This.Static_Address'Image, Ada.Strings.Left),
+           Absolute => True);
       elsif This.Has_Address then
-         return Tagatha.Operands.Indirect
-           (Tagatha.Operands.Local_Operand
-              (This.Local));
+         if This.Variable_State.all then
+            return Tagatha.Operands.Indirect
+              (Tagatha.Operands.Local_Operand
+                 (This.Local));
+         else
+            This.Variable_State.all := True;
+            return Tagatha.Operands.Local_Operand (This.Local);
+         end if;
       else
          return Tagatha.Operands.Local_Operand (This.Local);
       end if;

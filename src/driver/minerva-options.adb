@@ -10,6 +10,18 @@ package body Minerva.Options is
                ("execute", ' ');
    end Execute;
 
+   function Compile_Only return Boolean is
+   begin
+      return WL.Command_Line.Find_Option
+               ("compile-only", ' ');
+   end Compile_Only;
+
+   function Target return String is
+   begin
+      return WL.Command_Line.Find_Option
+               ("target", ' ');
+   end Target;
+
    function Trace_Environment return Boolean is
    begin
       return WL.Command_Line.Find_Option
