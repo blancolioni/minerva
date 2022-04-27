@@ -13,7 +13,6 @@ with Minerva.Library;
 with Minerva.Logging;
 with Minerva.Options;
 with Minerva.Parser;
-with Minerva.Paths;
 with Minerva.Primitives;
 
 with Minerva.Trees.Declarations;
@@ -76,7 +75,6 @@ package body Minerva.Build is
 
       if not Minerva.Options.Compile_Only then
          Assembly.Load (Name & ".s");
-         Assembly.Load (Minerva.Paths.Config_File ("arch/pdp-11/athena.s"));
          Assembly.Link;
          Assembly.Save (Output_Path);
       end if;
