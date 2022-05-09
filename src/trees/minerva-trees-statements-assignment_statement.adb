@@ -10,8 +10,10 @@ package body Minerva.Trees.Statements.Assignment_Statement is
    is
    begin
       This.Target.Check (Environment);
-      This.Value.Add_Possible_Type (This.Target.Get_Type);
-      This.Value.Check (Environment);
+      if This.Target.Has_Type then
+         This.Value.Add_Possible_Type (This.Target.Get_Type);
+         This.Value.Check (Environment);
+      end if;
    end Check_Tree;
 
    --------------
