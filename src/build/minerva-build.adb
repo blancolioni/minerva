@@ -1,3 +1,4 @@
+with Ada.Characters.Handling;
 with Ada.Directories;
 with Ada.Text_IO;
 
@@ -5,8 +6,6 @@ with GCS.Errors;
 
 with Tagatha.Arch;
 with Tagatha.Code;
-
-with Pdp11.Assembler;
 
 with Minerva.Errors;
 with Minerva.Library;
@@ -16,12 +15,76 @@ with Minerva.Parser;
 with Minerva.Primitives;
 
 with Minerva.Trees.Declarations;
+with Tagatha.Operands;
 
 package body Minerva.Build is
 
    procedure Compile_All
      (Main        : Minerva.Trees.Class_Reference;
       Source_File : String);
+
+   ----------------
+   -- Build_Main --
+   ----------------
+
+   procedure Build_Main
+     (Main_File : String)
+   is
+      function To_Link_Name (File_Name : String) return String;
+
+      ------------------
+      -- To_Link_Name --
+      ------------------
+
+      function To_Link_Name (File_Name : String) return String is
+         Base : constant String := Ada.Directories.Base_Name (File_Name);
+         Link : String (1 .. Base'Length * 2);
+         Last : Natural := 0;
+      begin
+         for Ch of Base loop
+            if Ch = '-' then
+               Last := Last + 1;
+               Link (Last) := '_';
+               Last := Last + 1;
+               Link (Last) := '_';
+            else
+               Last := Last + 1;
+               Link (Last) := Ada.Characters.Handling.To_Lower (Ch);
+            end if;
+         end loop;
+         return Link (1 .. Last);
+      end To_Link_Name;
+
+      Main_Procedure_Name : constant String :=
+                              To_Link_Name (Main_File);
+      Main_File_Path : constant String :=
+                         "m__"
+                         & Ada.Directories.Base_Name (Main_File)
+                         & ".s";
+      Unit : Tagatha.Code.Instance;
+   begin
+      Unit.Begin_Routine
+        (Name           => "main",
+         Argument_Words => 0,
+         Result_Words   => 0,
+         Global         => True);
+      Unit.Push
+        (Tagatha.Operands.External_Operand (Main_Procedure_Name));
+      Unit.Call
+        (Result         => Tagatha.Operands.No_Operand,
+         Argument_Count => 0);
+      Unit.End_Routine;
+
+      declare
+         Arch : Tagatha.Arch.Any_Instance :=
+                  Tagatha.Arch.Get
+                    (Minerva.Options.Target);
+      begin
+         Unit.Generate (Arch);
+         Arch.Save (Main_File_Path);
+      end;
+
+   end Build_Main;
 
    -----------------
    -- Compile_All --
@@ -33,10 +96,7 @@ package body Minerva.Build is
    is
       Name     : constant String :=
                    Ada.Directories.Base_Name (Source_File);
-      Output_Path : constant String :=
-                      Name & ".o";
       Unit     : Tagatha.Code.Instance;
-      Assembly : Pdp11.Assembler.Assembly_Type;
 
       procedure Compile_Unit
         (Compilation_Unit : Minerva.Trees.Declarations.Class_Reference);
@@ -72,12 +132,6 @@ package body Minerva.Build is
          Unit.Generate (Arch);
          Arch.Save (Name & ".s");
       end;
-
-      if not Minerva.Options.Compile_Only then
-         Assembly.Load (Name & ".s");
-         Assembly.Link;
-         Assembly.Save (Output_Path);
-      end if;
 
    end Compile_All;
 

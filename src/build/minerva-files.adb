@@ -1,6 +1,7 @@
 with Ada.Directories;
 with Ada.Text_IO;
 
+with Minerva.Options;
 with Minerva.Paths;
 
 package body Minerva.Files is
@@ -17,6 +18,14 @@ package body Minerva.Files is
         (Minerva.Paths.Config_File ("rts/" & File_Name))
       then
          return Minerva.Paths.Config_File ("rts/" & File_Name);
+      elsif Ada.Directories.Exists
+        (Minerva.Paths.Config_File
+           ("arch/" & Minerva.Options.Target
+            & "/" & File_Name))
+      then
+         return Minerva.Paths.Config_File
+           ("arch/" & Minerva.Options.Target
+            & "/" & File_Name);
       else
          Ada.Text_IO.Put_Line
            (Ada.Text_IO.Standard_Error,

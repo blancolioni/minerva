@@ -1,3 +1,4 @@
+with Ada.Exceptions;
 with Ada.Text_IO;
 
 with Minerva.Entries;
@@ -71,6 +72,14 @@ package body Minerva.Trees is
          Column => GCS.Positions.Get_Column (This.Position));
 
       This.Compile_Tree (Unit);
+
+   exception
+      when E : others =>
+         Ada.Text_IO.Put_Line
+           (Ada.Text_IO.Standard_Error,
+            "exception at " & GCS.Positions.Image (This.Position)
+            & ": " & Ada.Exceptions.Exception_Message (E));
+         raise;
    end Compile;
 
    ---------------

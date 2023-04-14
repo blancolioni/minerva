@@ -61,7 +61,7 @@ package body Minerva.Trees.Declarations.Subprograms is
       if This.Has_Body then
          Unit.Begin_Routine
            (Name           => This.Get_Entry.Link_Name,
-            Argument_Words => 0,
+            Argument_Words => This.Formal_Arguments.Length,
             Result_Words   => 0,
             Global         => True);
          This.Subprogram_Body.Compile (Unit);

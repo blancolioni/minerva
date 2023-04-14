@@ -6,6 +6,7 @@ with WL.Command_Line;
 
 with Minerva.Build;
 with Minerva.Logging;
+with Minerva.Options;
 with Minerva.Paths;
 
 procedure Minerva.Driver is
@@ -34,6 +35,10 @@ begin
             Success     => Success);
          if not Success then
             Ada.Command_Line.Set_Exit_Status (1);
+         end if;
+
+         if I = 1 and then not Minerva.Options.Compile_Only then
+            Minerva.Build.Build_Main (WL.Command_Line.Argument (I));
          end if;
       end loop;
    end if;

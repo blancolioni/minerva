@@ -12,9 +12,9 @@ source_dir = src/values
 main_unit = minerva-driver
 exec_name = minerva
 config_dir = config
-depend = { project = tagatha2 version = any }
+depend = { project = ../tagatha2/tagatha external = yes }
 depend = { project = gcs version = any }
 depend = { project = wlib version = any }
-depend = { project = pdp11 version = any }
+depend = { project = ../pdp11/pdp11 external = yes }
 path_unit = { unit = Minerva.Paths
               path = src/driver/minerva-paths.ads }
