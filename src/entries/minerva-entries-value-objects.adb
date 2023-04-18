@@ -85,6 +85,10 @@ package body Minerva.Entries.Value.Objects is
       end return;
    end Create_With_Static_Address;
 
+   ------------------
+   -- Push_Address --
+   ------------------
+
    overriding procedure Push_Address
      (This : Instance; Unit : in out Tagatha.Code.Instance)
    is

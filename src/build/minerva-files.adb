@@ -27,9 +27,11 @@ package body Minerva.Files is
            ("arch/" & Minerva.Options.Target
             & "/" & File_Name);
       else
-         Ada.Text_IO.Put_Line
-           (Ada.Text_IO.Standard_Error,
-            "cannot find file: " & File_Name);
+         if False then
+            Ada.Text_IO.Put_Line
+              (Ada.Text_IO.Standard_Error,
+               "cannot find file: " & File_Name);
+         end if;
          return "";
       end if;
    end Find_File;
