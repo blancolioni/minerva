@@ -1,0 +1,26 @@
+name = "minerva"
+description = ""
+version = "0.1.0-dev"
+
+authors = ["Fraser Wilson"]
+maintainers = ["Fraser Wilson <fraser@thewhitelion.eu>"]
+maintainers-logins = ["blancolioni"]
+licenses = "GPL-3.0-or-later"
+website = ""
+tags = []
+
+executables = ["minerva-driver"]
+
+[[depends-on]]
+wl_lib = "~0.1.1-dev"
+gcs = "*"
+tagatha = "*"
+pdp11 = "*"
+
+[[pins]]
+gcs = { path = "../gcs" }
+tagatha = { path = "../tagatha" }
+pdp11 = { path = "../pdp11" }
+
+[[depends-on]]
+parse_args = "~0.9.0"

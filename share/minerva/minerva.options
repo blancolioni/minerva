@@ -1,0 +1,6 @@
+package Minerva.Options is
+
+	Execute       : Boolean := False;
+	Write_Listing : Boolean := False;
+	
+end Minerva.Options;

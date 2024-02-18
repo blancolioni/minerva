@@ -1,13 +1,13 @@
 {
 	"folders": [
 		{
-			"path": "../aquarius"
-		},
-		{
-			"path": "../aquav3"
+			"path": "../macro-11"
 		},
 		{
 			"path": "."
+		},
+		{
+			"path": "../pdp11"
 		}
 	],
 	"settings": {}

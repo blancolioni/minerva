@@ -27,13 +27,8 @@ package body Minerva.Operators is
      (Name : Minerva.Names.Minerva_Name)
       return Minerva_Operator
    is
-      N : constant String := Minerva.Names.Standard_Text (Name);
    begin
-      if Name_Op_Map.Contains (N) then
-         return Name_Op_Map (N);
-      else
-         return Op_None;
-      end if;
+      return Name_Op_Map (Minerva.Names.Standard_Text (Name));
    end Get_Operator;
 
 begin
@@ -64,12 +59,12 @@ begin
    begin
       Map (Op_Abs, "abs");
       Map (Op_Not, "not");
-      Map (Op_Negate, "negate");
-      Map (Op_Exponent, "**");
-      Map (Op_Multiply, "*");
-      Map (Op_Divide, "/");
+      Map (Op_Neg, "negate");
+      Map (Op_Exp, "**");
+      Map (Op_Mul, "*");
+      Map (Op_Div, "/");
       Map (Op_Add, "+");
-      Map (Op_Subtract, "-");
+      Map (Op_Sub, "-");
       Map (Op_LE, "<=");
       Map (Op_LT, "<");
       Map (Op_GE, ">=");

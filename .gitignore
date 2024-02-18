@@ -1,27 +1,9 @@
-# Object file
-*.o
-*.s
-*.m11
-*.lst
-
-
-# Ada Library Information
-*.ali
-
-# Build files
-build
-!src/build
-
-# Generated files
-minerva.gpr
-src/driver/minerva-paths.ads
-#src/driver/minerva-options.ad[bs]
-
-# Log file
-log
-trace.txt
-
-.minerva-options
-gmon.out
-gprof.txt
-test.txt
+/obj/
+/bin/
+/alire/
+/config/
+/log/
+/tmp/
+/prg/
+.pdp11-config
+*~
